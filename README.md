@@ -113,7 +113,7 @@ Below are visual previews of Internova's primary functional areas. *Ensure you h
 </p>
 
 ---
-
+```
 ## 👤 Developer & Contact
 
 *   **Developer:** Mantra Bareda
