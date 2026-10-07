@@ -1,0 +1,602 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<style>
+    .internship-hero {
+        max-width: 900px;
+        margin: 2rem auto;
+        background: #141414;
+        border: 1px solid rgba(212, 175, 55, 0.3);
+        box-shadow: 0 0 20px rgba(212, 175, 55, 0.05);
+        padding: 2rem 1.5rem;
+        text-align: center;
+        border-radius: 1rem;
+        position: relative;
+        overflow: hidden;
+    }
+
+    @media (min-width: 768px) {
+        .internship-hero {
+            margin: 3rem auto;
+            padding: 3rem;
+            border-radius: 1.5rem;
+        }
+    }
+
+    .internship-hero::before {
+        content: '';
+        position: absolute;
+        top: -50%;
+        right: -20%;
+        width: 300px;
+        height: 300px;
+        background: radial-gradient(circle, rgba(103, 80, 164, 0.15) 0%, transparent 70%);
+        border-radius: 50%;
+        filter: blur(60px);
+    }
+    
+    @media (min-width: 768px) {
+        .internship-hero::before { width: 400px; height: 400px; filter: blur(80px); }
+    }
+
+    .internship-hero h1 {
+        font-size: clamp(1.75rem, 6vw, 2.5rem);
+        font-weight: 500;
+        color: #D4AF37;
+        margin-bottom: 0.75rem;
+        position: relative;
+        z-index: 1;
+    }
+
+    .internship-hero p {
+        color: silver;
+        font-size: 1rem;
+        position: relative;
+        z-index: 1;
+    }
+    
+    @media (min-width: 768px) {
+        .internship-hero p { font-size: 1.1rem; }
+    }
+
+    .loading-spinner {
+        display: inline-block;
+        width: 1.5rem;
+        height: 1.5rem;
+        border: 3px solid rgba(212, 175, 55, 0.3);
+        border-radius: 50%;
+        border-top-color: rgba(212, 175, 55, 1);
+        animation: spin 1s linear infinite;
+    }
+
+    @keyframes spin {
+        to { transform: rotate(360deg); }
+    }
+
+    .status-badge {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+        padding: 0.5rem 1rem;
+        border-radius: 9999px;
+        font-weight: 500;
+        font-size: 0.875rem;
+        margin-bottom: 1.5rem;
+        animation: slideInUp 0.4s cubic-bezier(0.2, 0, 0, 1);
+    }
+
+    .status-badge.ready {
+        background-color: rgba(76, 175, 80, 0.15);
+        color: #2E7D32;
+    }
+
+    .status-badge.not-ready {
+        background-color: rgba(244, 67, 54, 0.15);
+        color: #C62828;
+    }
+
+    .internship-grid {
+        display: grid;
+        grid-template-columns: 1fr;
+        gap: 1.25rem;
+        margin: 2rem 0;
+    }
+
+    @media (min-width: 768px) {
+        .internship-grid {
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 1.5rem;
+            margin: 2.5rem 0;
+        }
+    }
+
+    .internship-card {
+        background: var(--md-surface-container);
+        border-radius: 1.25rem;
+        padding: 1.5rem;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+        border: 1px solid transparent;
+        transition: all 300ms cubic-bezier(0.2, 0, 0, 1);
+        animation: scaleIn 0.5s cubic-bezier(0.2, 0, 0, 1);
+    }
+
+    @media (min-width: 768px) {
+        .internship-card { border-radius: 1.5rem; padding: 1.5rem; }
+        .internship-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
+            border-color: var(--md-outline-variant);
+        }
+    }
+
+    .internship-card.stagger-1 { animation-delay: 0.1s; }
+    .internship-card.stagger-2 { animation-delay: 0.2s; }
+    .internship-card.stagger-3 { animation-delay: 0.3s; }
+    .internship-card.stagger-4 { animation-delay: 0.4s; }
+    .internship-card.stagger-5 { animation-delay: 0.5s; }
+    .internship-card.stagger-6 { animation-delay: 0.6s; }
+
+    .internship-card-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: start;
+        margin-bottom: 0.75rem;
+    }
+
+    .internship-card h3 {
+        font-size: 1.125rem;
+        font-weight: 500;
+        color: var(--md-primary);
+        margin: 0 0 0.25rem 0;
+    }
+
+    .internship-card-company {
+        font-size: 0.875rem;
+        color: var(--md-on-surface-variant);
+        margin-bottom: 0.75rem;
+    }
+
+    .difficulty-badge {
+        display: inline-block;
+        padding: 0.25rem 0.75rem;
+        border-radius: 9999px;
+        font-size: 0.75rem;
+        font-weight: 600;
+        text-transform: uppercase;
+    }
+
+    .difficulty-badge.beginner {
+        background-color: rgba(76, 175, 80, 0.2);
+        color: #2E7D32;
+    }
+
+    .difficulty-badge.intermediate {
+        background-color: rgba(255, 193, 7, 0.2);
+        color: #F57F17;
+    }
+
+    .difficulty-badge.advanced {
+        background-color: rgba(244, 67, 54, 0.2);
+        color: #C62828;
+    }
+
+    .internship-card-description {
+        font-size: 0.9375rem;
+        color: var(--md-on-background);
+        margin-bottom: 1rem;
+        line-height: 1.5;
+    }
+
+    .internship-card-reason {
+        font-size: 0.875rem;
+        color: var(--md-on-surface-variant);
+        background-color: var(--md-surface-container-low);
+        padding: 0.75rem;
+        border-radius: 0.75rem;
+        margin-bottom: 1rem;
+        border-left: 3px solid var(--md-primary);
+    }
+
+    .internship-card-link {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        padding: 0.5rem 1rem;
+        min-height: 44px; /* Touch target */
+        background-color: #D4AF37;
+        color: black;
+        text-decoration: none;
+        border-radius: 9999px;
+        font-weight: 500;
+        font-size: 0.875rem;
+        transition: all 300ms cubic-bezier(0.2, 0, 0, 1);
+        width: 100%;
+    }
+    
+    @media (min-width: 768px) {
+        .internship-card-link { width: auto; display: inline-flex; }
+        .internship-card-link:hover {
+            background-color: rgba(212, 175, 55, 0.9);
+            box-shadow: 0 4px 12px rgba(212, 175, 55, 0.3);
+            transform: translateY(-2px);
+        }
+    }
+
+    .internship-card-link:active {
+        transform: scale(0.95);
+    }
+
+    .section-container {
+        margin: 60px 0;
+        animation: slideInUp 0.6s cubic-bezier(0.2, 0, 0, 1);
+    }
+
+    .section-title {
+        font-size: 1.875rem;
+        font-weight: 500;
+        color: #D4AF37;
+        margin-bottom: 8px;
+        display: flex;
+        align-items: center;
+        gap: 12px;
+    }
+
+    .section-description {
+        color: var(--md-on-surface-variant);
+        font-size: 1rem;
+        margin-bottom: 24px;
+    }
+
+    .readiness-box {
+        background: linear-gradient(135deg, rgba(255, 193, 7, 0.3) 17%, rgba(0, 0,0, 0.3) 100%);
+        border-radius: 24px;
+        padding: 32px;
+        margin-bottom: 32px;
+        border-left: 4px solid var(--md-primary);
+    }
+
+    .readiness-box h3 {
+        color: black;
+        font-size: 1.25rem;
+        margin-bottom: 12px;
+    }
+
+    .score-circle {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        width: 80px;
+        height: 80px;
+        border-radius: 50%;
+        background: conic-gradient(var(--md-primary) 0deg, var(--md-primary) var(--score-rotation), var(--md-surface-container-high) var(--score-rotation));
+        font-weight: 600;
+        font-size: 1.5rem;
+        color: Silver;
+        margin-bottom: 16px;
+    }
+
+    .action-steps {
+        background: var(--md-surface-container-low);
+        border-radius: 16px;
+        padding: 24px;
+        margin-top: 24px;
+    }
+
+    .action-steps h4 {
+        color: var(--md-on-background);
+        font-size: 1rem;
+        margin-bottom: 12px;
+    }
+
+    .action-steps ol {
+        margin: 0;
+        padding-left: 20px;
+        list-style-position: inside;
+    }
+
+    .action-steps li {
+        margin-bottom: 8px;
+        color: var(--md-on-surface-variant);
+        font-size: 0.9375rem;
+    }
+
+    .skills-to-improve {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+        gap: 20px;
+        margin-top: 24px;
+    }
+
+    .skill-card {
+        background: var(--md-surface-container);
+        border-radius: 16px;
+        padding: 20px;
+        border: 1px solid var(--md-outline-variant);
+        transition: all 300ms cubic-bezier(0.2, 0, 0, 1);
+    }
+
+    .skill-card:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    }
+
+    .skill-name {
+        font-weight: 600;
+        color: var(--md-primary);
+        margin-bottom: 8px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+
+    .priority-badge {
+        font-size: 0.75rem;
+        padding: 4px 10px;
+        border-radius: 9999px;
+        font-weight: 600;
+    }
+
+    .priority-badge.high {
+        background-color: rgba(244, 67, 54, 0.2);
+        color: #C62828;
+    }
+
+    .priority-badge.medium {
+        background-color: rgba(255, 193, 7, 0.2);
+        color: #F57F17;
+    }
+
+    .priority-badge.low {
+        background-color: rgba(76, 175, 80, 0.2);
+        color: #2E7D32;
+    }
+
+    .skill-description {
+        font-size: 0.875rem;
+        color: var(--md-on-surface-variant);
+        margin-bottom: 12px;
+    }
+
+    .learning-resources {
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+    }
+
+    .resource-link {
+        font-size: 0.8125rem;
+        color: var(--md-primary);
+        text-decoration: none;
+        padding: 6px 8px;
+        border-radius: 6px;
+        transition: all 200ms cubic-bezier(0.2, 0, 0, 1);
+        display: inline-block;
+        width: fit-content;
+    }
+
+    .resource-link:hover {
+        background-color: rgba(103, 80, 164, 0.1);
+        text-decoration: underline;
+    }
+
+    .message-box {
+        background: linear-gradient(135deg, rgba(125, 82, 96, 0.08) 0%, rgba(255, 216, 228, 0.2) 100%);
+        border-radius: 16px;
+        padding: 24px;
+        border-left: 4px solid var(--md-tertiary);
+        font-style: italic;
+        color: silver;
+        line-height: 1.6;
+    }
+
+    .empty-state {
+        text-align: center;
+        padding: 60px 20px;
+    }
+
+    .empty-state-icon {
+        font-size: 4rem;
+        margin-bottom: 16px;
+    }
+
+    .empty-state-text {
+        color: var(--md-on-surface-variant);
+        font-size: 1.125rem;
+        margin-bottom: 24px;
+    }
+
+    .btn-load {
+        padding: 12px 32px;
+        background-color: var(--md-primary);
+        color: white;
+        border: none;
+        border-radius: 9999px;
+        font-weight: 600;
+        cursor: pointer;
+        font-size: 1rem;
+        transition: all 300ms cubic-bezier(0.2, 0, 0, 1);
+    }
+
+    .btn-load:hover {
+        background-color: rgba(103, 80, 164, 0.9);
+        box-shadow: 0 4px 12px rgba(103, 80, 164, 0.3);
+    }
+
+    .btn-load:active {
+        transform: scale(0.95);
+    }
+</style>
+
+<div class="section-container">
+    <div class="breadcrumb" style="padding: 20px 0; display: flex; gap: 12px;">
+        <a href="{{ url_for('view_resume', resume_id=resume.id) }}" style="color: #D4AF37; text-decoration: none;">← Back to Analysis</a>
+    </div>
+    <div class="internship-hero">
+        <h1>Find Your Perfect Internship</h1>
+        <p>Get personalized internship recommendations based on your skills, education, and experience. Our AI analyzes your profile to suggest the best opportunities for your career stage.</p>
+    </div>
+
+    <div id="loading" style="display: none; text-align: center; padding: 40px;">
+        <div class="loading-spinner"></div>
+        <p style="margin-top: 16px; color: var(--md-on-surface-variant);">Analyzing your resume and finding perfect opportunities...</p>
+    </div>
+
+    <div id="content" style="display: none;">
+        <!-- Readiness Status -->
+        <div id="readiness-section"></div>
+
+        <!-- Personalized Message -->
+        <div id="message-section"></div>
+
+        <!-- Recommended Internships -->
+        <div id="internships-section"></div>
+
+        <!-- Skills to Improve -->
+        <div id="skills-section"></div>
+    </div>
+
+    <div id="error" style="display: none;">
+        <div style="background-color: rgba(244, 67, 54, 0.1); border-left: 4px solid #C62828; padding: 24px; border-radius: 12px; color: #C62828;">
+            <p id="error-message"></p>
+        </div>
+    </div>
+</div>
+
+<script>
+    const resumeId = {{ resume.id }};
+    
+    async function loadInternships() {
+        const loadingDiv = document.getElementById('loading');
+        const contentDiv = document.getElementById('content');
+        const errorDiv = document.getElementById('error');
+        
+        loadingDiv.style.display = 'block';
+        contentDiv.style.display = 'none';
+        errorDiv.style.display = 'none';
+        
+        try {
+            const response = await fetch(`{{ url_for('api_find_internships', resume_id=resume.id) }}`);
+            const data = await response.json();
+            
+            if (!response.ok) {
+                if (data.requires_generation) {
+                    throw new Error("Additional details not generated yet. Please go back to the Resume page and click 'Generate Advanced Features' to unlock this section.");
+                }
+                throw new Error(data.error || 'Failed to load internships');
+            }
+            
+            renderInternships(data);
+            loadingDiv.style.display = 'none';
+            contentDiv.style.display = 'block';
+        } catch (error) {
+            loadingDiv.style.display = 'none';
+            errorDiv.style.display = 'block';
+            document.getElementById('error-message').textContent = error.message;
+        }
+    }
+    
+    function renderInternships(data) {
+        // Readiness Section
+        const readinessHtml = `
+            <div class="section-container">
+                <div class="section-title">📊 Your Readiness</div>
+                <div class="readiness-box">
+                    <h3>${data.overall_readiness.ready_for_internship ? '✅ Ready for Internship!' : '🎯 Path to Readiness'}</h3>
+                    <div class="score-circle" style="--score-rotation: ${(data.overall_readiness.skill_score / 100) * 360}deg;">
+                        ${data.overall_readiness.skill_score}%
+                    </div>
+                    <p style="margin: 0; color: var(--md-on-background);">${data.overall_readiness.action_required}</p>
+                    <div class="action-steps">
+                        <h4>📋 Next Steps:</h4>
+                        <ol>
+                            ${data.next_steps.map(step => `<li>${step}</li>`).join('')}
+                        </ol>
+                    </div>
+                </div>
+            </div>
+        `;
+        document.getElementById('readiness-section').innerHTML = readinessHtml;
+        
+        // Message Section
+        if (data.personalized_message) {
+            const messageHtml = `
+                <div class="section-container">
+                    <div class="message-box">${data.personalized_message}</div>
+                </div>
+            `;
+            document.getElementById('message-section').innerHTML = messageHtml;
+        }
+        
+        // Internships Section
+        if (data.internships && data.internships.length > 0) {
+            const internshipsHtml = `
+                <div class="section-container">
+                    <div class="section-title">💼 Recommended Internships</div>
+                    <p class="section-description">These opportunities match your current skill level and academic background</p>
+                    <div class="internship-grid">
+                        ${data.internships.map((internship, index) => `
+                            <div class="internship-card stagger-${(index % 6) + 1}">
+                                <div class="internship-card-header">
+                                    <div>
+                                        <h3>${internship.title}</h3>
+                                        <div class="internship-card-company">${internship.company}</div>
+                                    </div>
+                                    <span class="difficulty-badge ${internship.difficulty}">${internship.difficulty}</span>
+                                </div>
+                                <p class="internship-card-description">${internship.description}</p>
+                                <div class="internship-card-reason">💡 ${internship.reason}</div>
+                                ${internship.courses && internship.courses.length > 0 ? `
+                                    <div style="margin-bottom: 1rem;">
+                                        <div style="font-size: 0.85rem; font-weight: 600; color: #D4AF37; margin-bottom: 0.5rem;">Recommended Courses:</div>
+                                        <div style="display: flex; flex-direction: column; gap: 0.5rem;">
+                                            ${internship.courses.map(course => `
+                                                <a href="${course.link}" target="_blank" style="display: flex; align-items: center; justify-content: space-between; padding: 0.5rem; background: rgba(212, 175, 55, 0.05); border: 1px solid rgba(212, 175, 55, 0.2); border-radius: 0.5rem; text-decoration: none; transition: all 200ms;">
+                                                    <span style="color: var(--md-on-background); font-size: 0.8rem; font-weight: 500;">${course.name}</span>
+                                                    <span style="font-size: 0.7rem; font-weight: 600; padding: 2px 6px; border-radius: 4px; background: ${course.type && course.type.toLowerCase() === 'free' ? 'rgba(76, 175, 80, 0.2)' : 'rgba(255, 193, 7, 0.2)'}; color: ${course.type && course.type.toLowerCase() === 'free' ? '#4CAF50' : '#F57F17'};">${course.type ? course.type.toUpperCase() : 'PAID'}</span>
+                                                </a>
+                                            `).join('')}
+                                        </div>
+                                    </div>
+                                ` : ''}
+                                <a href="${internship.link}" target="_blank" class="internship-card-link">Apply Now →</a>
+                            </div>
+                        `).join('')}
+                    </div>
+                </div>
+            `;
+            document.getElementById('internships-section').innerHTML = internshipsHtml;
+        }
+        
+        // Skills Section
+        if (data.skill_recommendations && data.skill_recommendations.length > 0) {
+            const skillsHtml = `
+                <div class="section-container">
+                    <div class="section-title">🎓 Skills to Improve</div>
+                    <p class="section-description">Focus on these skills to unlock more opportunities</p>
+                    <div class="skills-to-improve">
+                        ${data.skill_recommendations.map(skill => `
+                            <div class="skill-card">
+                                <div class="skill-name">
+                                    ${skill.skill}
+                                    <span class="priority-badge ${skill.priority}">${skill.priority}</span>
+                                </div>
+                                <p class="skill-description">Est. time: ${skill.estimated_time}</p>
+                                <div class="learning-resources">
+                                    ${skill.learning_resources.map(link => `
+                                        <a href="${link}" target="_blank" class="resource-link">📚 Learn more →</a>
+                                    `).join('')}
+                                </div>
+                            </div>
+                        `).join('')}
+                    </div>
+                </div>
+            `;
+            document.getElementById('skills-section').innerHTML = skillsHtml;
+        }
+    }
+    
+    // Load internships on page load
+    loadInternships();
+</script>
+
+{% endblock %}

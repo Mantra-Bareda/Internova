@@ -1,0 +1,484 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<style>
+    .mock-interview-hero {
+        background: linear-gradient(135deg, rgba(103, 80, 164, 0.1) 0%, rgba(125, 82, 96, 0.1) 100%);
+        border-radius: 1.5rem;
+        padding: 2rem 1.5rem;
+        margin: 2rem 0;
+        position: relative;
+        overflow: hidden;
+        animation: slideInDown 0.6s cubic-bezier(0.2, 0, 0, 1);
+        text-align: center;
+    }
+
+    @media (min-width: 768px) {
+        .mock-interview-hero {
+            padding: 4rem 2.5rem;
+            margin: 2.5rem 0;
+            border-radius: 2rem;
+            text-align: left;
+        }
+    }
+
+    .mock-interview-hero h1 {
+        font-size: clamp(1.75rem, 6vw, 2.5rem);
+        font-weight: 500;
+        color: var(--md-primary);
+        margin-bottom: 0.75rem;
+    }
+
+    .mock-interview-hero p {
+        color: var(--md-on-background);
+        font-size: 1rem;
+    }
+
+    @media (min-width: 768px) {
+        .mock-interview-hero p { font-size: 1.1rem; }
+    }
+
+    .interview-type-selector {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+        gap: 1rem;
+        margin: 2rem 0;
+    }
+
+    .type-button {
+        padding: 0.75rem 1rem;
+        background: silver;
+        border: 2px solid rgb(77, 77, 77);
+        border-radius: 0.75rem;
+        cursor: pointer;
+        font-family: 'Josefin Sans', sans-serif;
+        transition: all 300ms cubic-bezier(0.2, 0, 0, 1);
+        text-align: center;
+        font-weight: 500;
+        min-height: 44px; /* Touch target */
+    }
+
+    @media (min-width: 768px) {
+        .type-button { padding: 1rem; }
+    }
+
+    .type-button:hover {
+        color: black;
+        border-color: #D4AF37;
+        background: rgba(212, 175, 55, 0.2);
+    }
+
+    .type-button.active {
+        background: #D4AF37;
+        color: black;
+        border-color: #4b3900;
+    }
+
+    .question-card {
+        background: var(--md-surface-container);
+        border-radius: 1rem;
+        padding: 1.25rem;
+        margin-bottom: 1.25rem;
+        border-left: 4px solid var(--md-primary);
+        animation: slideInUp 0.4s cubic-bezier(0.2, 0, 0, 1);
+        transition: all 300ms cubic-bezier(0.2, 0, 0, 1);
+    }
+
+    @media (min-width: 768px) {
+        .question-card { padding: 1.5rem; }
+        .question-card:hover {
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            transform: translateX(4px);
+        }
+    }
+
+    .question-card.stagger-1 { animation-delay: 0.1s; }
+    .question-card.stagger-2 { animation-delay: 0.2s; }
+    .question-card.stagger-3 { animation-delay: 0.3s; }
+    .question-card.stagger-4 { animation-delay: 0.4s; }
+    .question-card.stagger-5 { animation-delay: 0.5s; }
+
+    .question-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: start;
+        margin-bottom: 0.75rem;
+        flex-wrap: wrap;
+        gap: 0.5rem;
+    }
+
+    @media (min-width: 768px) {
+        .question-header { flex-wrap: nowrap; gap: 0; }
+    }
+
+    .question-number {
+        font-size: 2rem;
+        font-weight: 700;
+        color: var(--md-primary);
+        margin-right: 0.75rem;
+    }
+
+    .question-badges {
+        display: flex;
+        gap: 0.5rem;
+        flex-wrap: wrap;
+    }
+
+    .badge {
+        display: inline-block;
+        padding: 0.25rem 0.75rem;
+        border-radius: 9999px;
+        font-size: 0.75rem;
+        font-weight: 600;
+    }
+
+    .badge.category {
+        background: rgba(103, 80, 164, 0.15);
+        color: var(--md-primary);
+    }
+
+    .badge.difficulty-easy {
+        background: rgba(76, 175, 80, 0.2);
+        color: #2E7D32;
+    }
+
+    .badge.difficulty-medium {
+        background: rgba(255, 193, 7, 0.2);
+        color: #F57F17;
+    }
+
+    .badge.difficulty-hard {
+        background: rgba(244, 67, 54, 0.2);
+        color: #C62828;
+    }
+
+    .question-text {
+        font-size: 1rem;
+        font-weight: 500;
+        color: var(--md-on-background);
+        margin-bottom: 1rem;
+        line-height: 1.6;
+    }
+    
+    @media (min-width: 768px) {
+        .question-text { font-size: 1.125rem; }
+    }
+
+    .question-section {
+        margin-bottom: 1rem;
+    }
+
+    .question-section-title {
+        font-size: 0.875rem;
+        font-weight: 600;
+        color: var(--md-primary);
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        margin-bottom: 0.5rem;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+
+    .question-section-content {
+        background: var(--md-surface-container-low);
+        padding: 1rem;
+        border-radius: 0.75rem;
+        color: var(--md-on-background);
+        line-height: 1.6;
+        font-size: 0.95rem;
+    }
+
+    .hint-icon::before { content: '💡'; }
+    .answer-icon::before { content: '✅'; }
+    .look-for-icon::before { content: '🎯'; }
+
+    .toggle-content {
+        max-height: 0;
+        overflow: hidden;
+        transition: max-height 300ms cubic-bezier(0.2, 0, 0, 1);
+    }
+
+    .toggle-content.open { max-height: 1000px; }
+
+    .toggle-button {
+        background: none;
+        border: none;
+        color: var(--md-primary);
+        font-weight: 600;
+        cursor: pointer;
+        padding: 0.5rem 0;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        transition: all 300ms cubic-bezier(0.2, 0, 0, 1);
+        min-height: 44px; /* Touch target */
+    }
+
+    .toggle-button:hover { gap: 0.75rem; }
+
+    .toggle-button.open::after {
+        content: '▼';
+        transform: rotate(180deg);
+        transition: transform 300ms;
+    }
+
+    .toggle-button.closed::after { content: '▶'; }
+
+    .tips-section {
+        background: linear-gradient(135deg, rgba(232, 222, 248, 0.4) 0%, rgba(232, 222, 248, 0.2) 100%);
+        border-radius: 1rem;
+        padding: 1.5rem;
+        margin: 2rem 0;
+        border-left: 4px solid #D4AF37;
+    }
+    
+    @media (min-width: 768px) {
+        .tips-section { border-radius: 1rem; padding: 1.5rem; margin: 2rem 0; }
+    }
+
+    .tips-section h3 {
+        color: var(--md-secondary);
+        font-size: 1.25rem;
+        margin-bottom: 1rem;
+    }
+
+    .tips-grid {
+        display: grid;
+        grid-template-columns: 1fr;
+        gap: 1rem;
+    }
+
+    @media (min-width: 768px) {
+        .tips-grid { grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); }
+    }
+
+    .tip-item {
+        background: var(--md-surface);
+        padding: 1rem;
+        border-radius: 0.75rem;
+        border: 1px solid var(--md-outline-variant);
+        animation: scaleIn 0.4s cubic-bezier(0.2, 0, 0, 1);
+    }
+
+    .tip-item:nth-child(1) { animation-delay: 0.1s; }
+    .tip-item:nth-child(2) { animation-delay: 0.2s; }
+    .tip-item:nth-child(3) { animation-delay: 0.3s; }
+    .tip-item:nth-child(4) { animation-delay: 0.4s; }
+    .tip-item:nth-child(5) { animation-delay: 0.5s; }
+
+    .tip-item strong {
+        color: var(--md-primary);
+        display: block;
+        margin-bottom: 0.5rem;
+    }
+
+    .role-context {
+        background: var(--md-surface-container-high);
+        border-radius: 1rem;
+        padding: 1.5rem;
+        margin: 2rem 0;
+        border: 1px solid var(--md-outline-variant);
+    }
+
+    .role-context h3 {
+        color: var(--md-primary);
+        margin-bottom: 0.75rem;
+    }
+
+    .role-context p {
+        color: var(--md-on-background);
+        line-height: 1.6;
+    }
+
+    .loading-spinner {
+        display: inline-block;
+        width: 1.5rem;
+        height: 1.5rem;
+        border: 3px solid rgba(103, 80, 164, 0.2);
+        border-radius: 50%;
+        border-top-color: #D4AF37;
+        animation: spin 1s linear infinite;
+    }
+
+    @keyframes spin {
+        to { transform: rotate(360deg); }
+    }
+
+    .container-section {
+        max-width: 900px;
+        margin: 2rem auto;
+        padding: 0 1rem;
+    }
+    
+    @media (min-width: 768px) {
+        .container-section { padding: 0 1.25rem; margin: 2.5rem auto; }
+    }
+</style>
+
+<div class="container-section">
+    <div class="breadcrumb" style="padding: 20px 0; display: flex; gap: 12px;">
+        <a href="/resume/{{ resume.id }}" style="color: #D4AF37; text-decoration: none;">← Back to Analysis</a>
+    </div>
+    <div class="mock-interview-hero">
+        <h1 style="color:#D4AF37;">🎤 Mock Interview Questions</h1>
+        <p style="color:silver;">Practice with AI-generated interview questions tailored to your resume and the role you're interested in. Get prepared for your real interviews!</p>
+    </div>
+
+    <div class="interview-type-selector" id="typeSelector">
+        <button class="type-button active" onclick="selectType('general')">General</button>
+        <button class="type-button" onclick="selectType('technical')">Technical</button>
+        <button class="type-button" onclick="selectType('behavioral')">Behavioral</button>
+        <button class="type-button" onclick="selectType('system-design')">System Design</button>
+        <button class="type-button" onclick="selectType('data-structures')">Data Structures</button>
+    </div>
+
+    <div id="loading" style="display: none; text-align: center; padding: 40px;">
+        <div class="loading-spinner"></div>
+        <p style="margin-top: 16px; color: var(--md-on-surface-variant);">Generating interview questions based on your resume...</p>
+    </div>
+
+    <div id="content" style="display: none;">
+        <div id="role-context-section"></div>
+        <div id="questions-section"></div>
+        <div id="tips-section"></div>
+    </div>
+
+    <div id="error" style="display: none;">
+        <div style="background-color: rgba(244, 67, 54, 0.1); border-left: 4px solid #C62828; padding: 24px; border-radius: 12px; color: #C62828;">
+            <p id="error-message"></p>
+        </div>
+    </div>
+</div>
+
+<script>
+    const resumeId = {{ resume.id }};
+    let currentType = 'general';
+    
+    function selectType(type) {
+        currentType = type;
+        
+        // Update button states
+        document.querySelectorAll('.type-button').forEach(btn => {
+            btn.classList.remove('active');
+        });
+        event.target.classList.add('active');
+        
+        loadQuestions();
+    }
+    
+    async function loadQuestions() {
+        const loadingDiv = document.getElementById('loading');
+        const contentDiv = document.getElementById('content');
+        const errorDiv = document.getElementById('error');
+        
+        loadingDiv.style.display = 'block';
+        contentDiv.style.display = 'none';
+        errorDiv.style.display = 'none';
+        
+        try {
+            const response = await fetch(`/api/generate_interview_questions/${resumeId}?type=${currentType}`);
+            const data = await response.json();
+            
+            if (!response.ok) {
+                if (data.requires_generation) {
+                    throw new Error("Additional details not generated yet. Please go back to the Resume page and click 'Generate Advanced Features' to unlock this section.");
+                }
+                throw new Error(data.error || 'Failed to load questions');
+            }
+            
+            renderQuestions(data);
+            loadingDiv.style.display = 'none';
+            contentDiv.style.display = 'block';
+        } catch (error) {
+            loadingDiv.style.display = 'none';
+            errorDiv.style.display = 'block';
+            document.getElementById('error-message').textContent = error.message;
+        }
+    }
+    
+    function renderQuestions(data) {
+        // Role Context
+        if (data.role_context) {
+            const roleHtml = `
+                <div class="role-context">
+                    <h3>📍 Role Context</h3>
+                    <p>${data.role_context}</p>
+                </div>
+            `;
+            document.getElementById('role-context-section').innerHTML = roleHtml;
+        }
+        
+        // Questions
+        if (data.questions && data.questions.length > 0) {
+            const questionsHtml = `
+                <div id="questions-container">
+                    ${data.questions.map((q, index) => `
+                        <div class="question-card stagger-${(index % 5) + 1}">
+                            <div class="question-header">
+                                <div class="question-number">${index + 1}</div>
+                                <div class="question-badges">
+                                    <span class="badge category">${q.category}</span>
+                                    <span class="badge difficulty-${q.difficulty}">${q.difficulty.toUpperCase()}</span>
+                                </div>
+                            </div>
+                            
+                            <div class="question-text">${q.question}</div>
+                            
+                            <button class="toggle-button closed" onclick="toggleContent(this)">
+                                <span>Show Tips & Answer</span>
+                            </button>
+                            
+                            <div class="toggle-content">
+                                <div class="question-section">
+                                    <div class="question-section-title hint-icon">Hint</div>
+                                    <div class="question-section-content">${q.hint}</div>
+                                </div>
+                                
+                                <div class="question-section">
+                                    <div class="question-section-title answer-icon">Sample Answer</div>
+                                    <div class="question-section-content">${q.sample_answer}</div>
+                                </div>
+                                
+                                <div class="question-section">
+                                    <div class="question-section-title look-for-icon">What Interviewer Looks For</div>
+                                    <div class="question-section-content">${q.what_interviewer_looks_for}</div>
+                                </div>
+                            </div>
+                        </div>
+                    `).join('')}
+                </div>
+            `;
+            document.getElementById('questions-section').innerHTML = questionsHtml;
+        }
+        
+        // Tips
+        if (data.interview_tips && data.interview_tips.length > 0) {
+            const tipsHtml = `
+                <div class="tips-section">
+                    <h3 style="color: silver">💡 Interview Tips</h3>
+                    <div class="tips-grid">
+                        ${data.interview_tips.map(tip => `
+                            <div class="tip-item" style="color: black">
+                                ${tip}
+                            </div>
+                        `).join('')}
+                    </div>
+                </div>
+            `;
+            document.getElementById('tips-section').innerHTML = tipsHtml;
+        }
+    }
+    
+    function toggleContent(button) {
+        const content = button.nextElementSibling;
+        content.classList.toggle('open');
+        button.classList.toggle('open');
+        button.classList.toggle('closed');
+    }
+    
+    // Load questions on page load
+    loadQuestions();
+</script>
+
+{% endblock %}

@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Internova | Intelligent Career Platform</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/material-design-3.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <style>
+        /* Responsive Navbar */
+        .site-nav {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1rem;
+            background: rgba(10, 10, 10, 0.95);
+            backdrop-filter: blur(10px);
+            border-bottom: 1px solid rgba(212, 175, 55, 0.2);
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+        }
+
+        .site-nav-logo {
+            text-decoration: none; 
+            color: inherit; 
+            display: flex; 
+            align-items: center;
+        }
+
+        .site-nav-logo h2 {
+            margin: 0;
+            font-size: 1.5rem;
+        }
+
+        .site-nav-menu {
+            list-style: none;
+            display: none; /* Mobile hidden by default */
+            flex-direction: column;
+            width: 100%;
+            position: absolute;
+            top: 100%;
+            left: 0;
+            background: rgba(10, 10, 10, 0.98);
+            border-bottom: 1px solid rgba(212, 175, 55, 0.2);
+            padding: 0;
+            margin: 0;
+        }
+
+        .site-nav-menu.active {
+            display: flex;
+        }
+
+        .site-nav-menu li {
+            width: 100%;
+            text-align: center;
+            padding: 1rem 0;
+            border-top: 1px solid rgba(255, 255, 255, 0.05);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .site-nav-menu li a {
+            text-decoration: none;
+            color: var(--fg-primary);
+            font-size: 1.1rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 100%;
+            height: 100%;
+            min-height: 44px; /* Touch target */
+        }
+
+        .hamburger {
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+            cursor: pointer;
+            padding: 10px;
+            background: transparent;
+            border: none;
+            min-height: 44px;
+            min-width: 44px;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .hamburger span {
+            display: block;
+            width: 25px;
+            height: 3px;
+            background: #D4AF37;
+            transition: all 0.3s ease;
+        }
+
+        @media (min-width: 768px) {
+            .site-nav {
+                padding: 1rem 2rem;
+            }
+            .site-nav-logo h2 {
+                font-size: 1.875rem;
+            }
+            .site-nav-menu {
+                display: flex;
+                flex-direction: row;
+                position: static;
+                width: auto;
+                border: none;
+                background: transparent;
+                gap: 1.5rem;
+                align-items: center;
+            }
+            .site-nav-menu li {
+                width: auto;
+                padding: 0;
+                border: none;
+            }
+            .site-nav-menu li a {
+                width: auto;
+            }
+            .hamburger {
+                display: none;
+            }
+        }
+        
+        /* General layout */
+        html, body {
+            overflow-x: hidden;
+            width: 100%;
+        }
+        main {
+            width: 100%;
+            max-width: 100vw;
+            overflow-x: hidden;
+        }
+    </style>
+</head>
+<body>
+    <nav class="site-nav">
+        <a href="{{ url_for('index') }}" class="site-nav-logo">
+            <h2>🎓 <span style="text-shadow: 0 0 10px #6750A4;">Internova</span></h2>
+        </a>
+        <button class="hamburger" id="hamburger-menu" aria-label="Toggle navigation">
+            <span></span>
+            <span></span>
+            <span></span>
+        </button>
+        <ul class="site-nav-menu" id="nav-menu">
+            {% if session.user_id %}
+                {% if user %}
+                <li style="color: #D4AF37; font-weight: bold;">
+                    🪙 Credits: <span id="nav-credit-count" style="margin-left: 5px;">{{ user.credits }}</span>
+                </li>
+                {% endif %}
+                <li><a href="{{ url_for('dashboard', user_id=session.user_id) }}">Dashboard</a></li>
+                <li><a href="{{ url_for('account') }}">Account</a></li>
+                <li><a href="{{ url_for('logout') }}">Logout</a></li>
+            {% else %}
+                <li><a href="{{ url_for('login') }}">Login</a></li>
+            {% endif %}
+        </ul>
+    </nav>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const hamburger = document.getElementById('hamburger-menu');
+            const navMenu = document.getElementById('nav-menu');
+
+            hamburger.addEventListener('click', () => {
+                navMenu.classList.toggle('active');
+            });
+        });
+    </script>
+
+    <main class="container" style="flex: 1;">
+        {% block content %}{% endblock %}
+    </main>
+
+    <footer style="text-align: center; padding: 40px 20px; border-top: 1px solid rgba(255,255,255,0.05); margin-top: auto; color: var(--fg-muted);">
+        <p style="margin: 0;">&copy; 2026 Internova. Your AI Career Companion.</p>
+    </footer>
+
+    <script src="{{ url_for('static', filename='js/main.js') }}"></script>
+</body>
+</html>

@@ -1,0 +1,191 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<style>
+    .alignment-header {
+        text-align: center;
+        margin: 2rem 0;
+        animation: slideInDown 0.6s cubic-bezier(0.2, 0, 0, 1);
+    }
+
+    @media (min-width: 768px) {
+        .alignment-header { margin: 3rem 0; }
+    }
+
+    .alignment-header h1 {
+        font-size: clamp(2rem, 5vw, 2.5rem);
+        margin-bottom: 0.5rem;
+    }
+
+    .alignment-header p {
+        color: silver;
+        max-width: 600px;
+        margin: 1rem auto;
+        font-size: 1rem;
+    }
+
+    @media (min-width: 768px) {
+        .alignment-header p { font-size: 1.125rem; }
+    }
+
+    .alignment-grid {
+        display: grid;
+        grid-template-columns: 1fr;
+        gap: 1.5rem;
+        margin-bottom: 2.5rem;
+    }
+
+    @media (min-width: 768px) {
+        .alignment-grid {
+            grid-template-columns: 1fr 1fr;
+            gap: 2rem;
+        }
+    }
+
+    .metric-value {
+        font-size: clamp(2.5rem, 8vw, 3.5rem);
+        font-weight: 600;
+        font-family: 'Marcellus', serif;
+        color: #D4AF37;
+        line-height: 1;
+        margin: 1rem 0;
+    }
+
+    .risk-high { color: #e74c3c; text-shadow: 0 0 10px rgba(231, 76, 60, 0.3); }
+    .risk-med { color: #f39c12; text-shadow: 0 0 10px rgba(243, 156, 18, 0.3); }
+    .risk-low { color: #2ecc71; text-shadow: 0 0 10px rgba(46, 204, 113, 0.3); }
+
+    .path-card {
+        background: rgba(30, 61, 89, 0.1);
+        border-left: 2px solid #D4AF37;
+        padding: 1.25rem;
+        margin-bottom: 1rem;
+    }
+
+    @media (min-width: 768px) {
+        .path-card { padding: 1.5rem; }
+    }
+
+    .path-title {
+        font-family: 'Marcellus', serif;
+        font-size: 1.25rem;
+        color: #F2F0E4;
+        margin-bottom: 0.5rem;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        flex-wrap: wrap;
+        gap: 0.5rem;
+    }
+
+    .skill-tag {
+        display: inline-block;
+        padding: 0.25rem 0.75rem;
+        background: rgba(212, 175, 55, 0.1);
+        border: 1px solid rgba(212, 175, 55, 0.3);
+        color: #D4AF37;
+        font-size: 0.85rem;
+        margin: 0.25rem 0.25rem 0 0;
+        border-radius: 9999px; /* Pill shape for better aesthetics */
+    }
+</style>
+
+<div class="container-main" style="padding: 0 20px;">
+    <div class="breadcrumb" style="padding: 20px 0;">
+        <a href="{{ url_for('view_resume', resume_id=resume.id) }}" style="color: #D4AF37; text-decoration: none;">← Back to Analysis</a>
+    </div>
+
+    <div class="alignment-header">
+        <h1>⚖️ Career Alignment</h1>
+        <p>Market scoping, AI vulnerability index, and exact skill mapping based on your current resume data.</p>
+    </div>
+
+    <div id="loading-state" style="text-align: center; padding: 60px 20px;">
+        <div class="loading-spinner" style="border: 4px solid rgba(212, 175, 55, 0.2); border-top-color: #D4AF37; border-radius: 50%; width: 40px; height: 40px; animation: spin 1s linear infinite; margin: 0 auto;"></div>
+        <p style="color: silver; margin-top: 16px;">Analyzing market vectors and AI trends...</p>
+    </div>
+
+    <div id="alignment-results" style="display: none;">
+        
+        <!-- Recommended Paths -->
+        <div class="card" style="margin-bottom: 32px;">
+            <h2 style="font-size: 1.5rem; margin-bottom: 24px;">🎯 Skill-to-Field Mapping</h2>
+            <div id="recommended-paths"></div>
+        </div>
+
+        <div class="alignment-grid">
+            <!-- AI Vulnerability Index -->
+            <div class="card">
+                <h2 style="font-size: 1.25rem;">🤖 AI Vulnerability Index</h2>
+                <div class="metric-value" id="ai-risk-score"></div>
+                <strong style="color: silver; font-size: 1.1rem; text-transform: uppercase;" id="ai-risk-level"></strong>
+                <p style="color: #888; margin-top: 16px;" id="ai-analysis"></p>
+                <div style="margin-top: 24px; padding-top: 16px; border-top: 1px solid rgba(212, 175, 55, 0.2);">
+                    <strong style="color: #D4AF37;">Future-Proofing Advice:</strong>
+                    <p style="color: silver; font-size: 0.95rem; margin-top: 8px;" id="ai-advice"></p>
+                </div>
+            </div>
+
+            <!-- Market Scope & Growth -->
+            <div class="card">
+                <h2 style="font-size: 1.25rem;">📈 Market Scope</h2>
+                <div class="metric-value" id="market-demand"></div>
+                <strong style="color: silver; font-size: 1.1rem; text-transform: uppercase;">Current Hiring Demand</strong>
+                <p style="color: #888; margin-top: 16px;" id="market-growth"></p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    document.addEventListener("DOMContentLoaded", async function() {
+        try {
+            const res = await fetch(`{{ url_for('api_career_alignment', resume_id=resume.id) }}`, { method: 'POST' });
+            const data = await res.json();
+            
+            if (!res.ok && data.requires_generation) {
+                document.getElementById('loading-state').innerHTML = `<p style="color: #C62828; font-weight: bold; padding: 20px;">Additional details not generated yet. Please go back to the Resume page and click 'Generate Advanced Features' to unlock this section.</p>`;
+                return;
+            }
+            
+            document.getElementById('loading-state').style.display = 'none';
+            document.getElementById('alignment-results').style.display = 'block';
+            
+            // Recommended Paths
+            const pathsDiv = document.getElementById('recommended-paths');
+            pathsDiv.innerHTML = data.recommended_paths.map(path => `
+                <div class="path-card">
+                    <div class="path-title">
+                        <span>${path.role}</span>
+                        <span style="color: #D4AF37; font-size: 1rem;">${path.match_percentage}% Match</span>
+                    </div>
+                    <p style="color: #888; font-size: 0.95rem; margin-bottom: 12px;">${path.reasoning}</p>
+                    <div><strong style="color: silver; font-size: 0.85rem; text-transform: uppercase;">Mandatory Skills to Bridge:</strong><br>
+                        ${path.missing_skills.map(s => `<span class="skill-tag">${s}</span>`).join('')}
+                    </div>
+                </div>
+            `).join('');
+
+            // AI Risk
+            const score = data.ai_vulnerability.risk_score;
+            const riskScoreEl = document.getElementById('ai-risk-score');
+            riskScoreEl.innerText = `${score}% Risk`;
+            
+            if(score > 60) riskScoreEl.className = "metric-value risk-high";
+            else if(score > 30) riskScoreEl.className = "metric-value risk-med";
+            else riskScoreEl.className = "metric-value risk-low";
+
+            document.getElementById('ai-risk-level').innerText = data.ai_vulnerability.risk_level;
+            document.getElementById('ai-analysis').innerText = data.ai_vulnerability.analysis;
+            document.getElementById('ai-advice').innerText = data.ai_vulnerability.future_proofing_advice;
+
+            // Market Scope
+            document.getElementById('market-demand').innerText = data.market_scope.hiring_demand;
+            document.getElementById('market-growth').innerText = data.market_scope.growth_trajectory;
+            
+        } catch (err) {
+            document.getElementById('loading-state').innerHTML = `<p style="color: #e74c3c;">Failed to analyze market vectors. Please try again.</p>`;
+        }
+    });
+</script>
+{% endblock %}

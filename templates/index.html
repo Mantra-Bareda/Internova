@@ -1,0 +1,314 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<style>
+    .hero-section {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        min-height: calc(100vh - 100px);
+        padding: 2rem 1.25rem;
+        background: transparent;
+        position: relative;
+        overflow: hidden;
+    }
+
+    @media (min-width: 768px) {
+        .hero-section { padding: 3.75rem 1.25rem; }
+    }
+
+    .hero-content {
+        max-width: 600px;
+        text-align: center;
+        position: relative;
+        z-index: 1;
+        animation: slideInUp 0.6s cubic-bezier(0.2, 0, 0, 1);
+    }
+
+    .hero-content h1 {
+        font-size: clamp(2rem, 8vw, 3.5rem);
+        font-weight: 500;
+        color: var(--md-primary);
+        margin-bottom: 1rem;
+        line-height: 1.2;
+    }
+
+    .hero-content p {
+        font-size: 1rem;
+        color: var(--md-on-surface-variant);
+        margin-bottom: 2rem;
+        line-height: 1.6;
+    }
+
+    @media (min-width: 768px) {
+        .hero-content p {
+            font-size: 1.125rem;
+            margin-bottom: 2.5rem;
+        }
+    }
+
+    .auth-buttons {
+        display: flex;
+        flex-direction: column;
+        gap: 1rem;
+        justify-content: center;
+    }
+
+    @media (min-width: 768px) {
+        .auth-buttons {
+            flex-direction: row;
+        }
+    }
+
+    .auth-button {
+        padding: 0.75rem 2rem;
+        border-radius: 9999px;
+        font-weight: 600;
+        font-size: 1rem;
+        border: none;
+        cursor: pointer;
+        transition: all 300ms cubic-bezier(0.2, 0, 0, 1);
+        text-decoration: none;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        min-height: 44px; /* Touch target */
+        width: 100%;
+    }
+
+    @media (min-width: 768px) {
+        .auth-button { width: auto; }
+    }
+
+    .auth-button.primary {
+        background-color:#D4AF37;
+        color:#21005D;
+    }
+
+    @media (min-width: 768px) {
+        .auth-button.primary:hover {
+            box-shadow: 0 8px 20px rgba(212, 175, 55, 0.5);
+            transform: translateY(-2px);
+        }
+    }
+
+    .auth-button.secondary {
+        background-color: transparent;
+        border: 2px solid var(--md-primary);
+        color: var(--md-primary);
+    }
+
+    @media (min-width: 768px) {
+        .auth-button.secondary:hover {
+            border-color: #D4AF37;
+            color: #D4AF37;
+        }
+    }
+
+    .auth-button:active {
+        transform: scale(0.95);
+    }
+
+    .features-section {
+        max-width: 1200px;
+        margin: 3rem auto;
+        padding: 0 1rem;
+    }
+
+    @media (min-width: 768px) {
+        .features-section { margin: 5rem auto; padding: 0 1.25rem; }
+    }
+
+    .features-title {
+        text-align: center;
+        font-size: 1.75rem;
+        font-weight: 500;
+        color: var(--md-primary);
+        margin-bottom: 0.75rem;
+    }
+
+    @media (min-width: 768px) {
+        .features-title { font-size: 2rem; }
+    }
+
+    .features-subtitle {
+        text-align: center;
+        color: var(--md-on-surface-variant);
+        font-size: 1rem;
+        margin-bottom: 2rem;
+    }
+
+    @media (min-width: 768px) {
+        .features-subtitle { margin-bottom: 3rem; }
+    }
+
+    .features-grid {
+        display: grid;
+        grid-template-columns: 1fr;
+        gap: 1.5rem;
+    }
+
+    @media (min-width: 768px) {
+        .features-grid {
+            grid-template-columns: repeat(2, 1fr);
+            gap: 2rem;
+        }
+    }
+
+    .feature-card {
+        background: var(--md-surface-container);
+        border-radius: 1.5rem;
+        padding: 1.5rem;
+        text-align: center;
+        animation: scaleIn 0.5s cubic-bezier(0.2, 0, 0, 1);
+        transition: all 300ms cubic-bezier(0.2, 0, 0, 1);
+    }
+
+    @media (min-width: 768px) {
+        .feature-card { padding: 2rem 1.5rem; }
+    }
+
+    .feature-card:nth-child(1) { animation-delay: 0.1s; }
+    .feature-card:nth-child(2) { animation-delay: 0.2s; }
+    .feature-card:nth-child(3) { animation-delay: 0.3s; }
+
+    @media (min-width: 768px) {
+        .feature-card:hover {
+            transform: translateY(-8px);
+            box-shadow: 0 12px 32px rgba(0, 0, 0, 0.12);
+        }
+    }
+
+    .feature-icon {
+        font-size: 2.5rem;
+        margin-bottom: 1rem;
+    }
+    
+    @media (min-width: 768px) {
+        .feature-icon { font-size: 3rem; }
+    }
+
+    .feature-card h3 {
+        font-size: 1.25rem;
+        font-weight: 600;
+        color: var(--md-primary);
+        margin: 0 0 0.75rem 0;
+    }
+
+    .feature-card p {
+        color: #F2F0E4;
+        line-height: 1.6;
+        margin: 0;
+        font-size: 0.95rem;
+    }
+    
+    @media (min-width: 768px) {
+        .feature-card p { font-size: 1rem; }
+    }
+
+    .cta-section {
+        background: linear-gradient(135deg, rgba(103, 80, 164, 0.1) 0%, rgba(232, 222, 248, 0.2) 100%);
+        border-radius: 1.5rem;
+        padding: 2.5rem 1.5rem;
+        text-align: center;
+        margin: 3rem 1rem;
+        max-width: 1000px;
+        animation: slideInUp 0.6s cubic-bezier(0.2, 0, 0, 1);
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+    }
+
+    @media (min-width: 768px) {
+        .cta-section {
+            padding: 3.75rem 2.5rem;
+            margin: 5rem auto 2.5rem;
+            border-radius: 2rem;
+        }
+    }
+
+    .cta-section h2 {
+        font-size: 1.75rem;
+        font-weight: 500;
+        color: var(--md-primary);
+        margin-bottom: 0.75rem;
+    }
+
+    @media (min-width: 768px) {
+        .cta-section h2 { font-size: 2rem; }
+    }
+
+    .cta-section p {
+        font-size: 1rem;
+        color: var(--md-on-surface-variant);
+        margin-bottom: 1.5rem;
+        max-width: 500px;
+        margin-left: auto;
+        margin-right: auto;
+    }
+
+    @media (min-width: 768px) {
+        .cta-section p {
+            font-size: 1.125rem;
+            margin-bottom: 2rem;
+        }
+    }
+</style>
+
+<div class="hero-section">
+    <div class="hero-content">
+        <h1 style="color:#D4AF37;">🎓 <span style="text-shadow: 0 0 10px #D4AF37;">Welcome to Internova</span></h1>
+        <p style="color:silver;">Your intelligent career companion. Get AI-powered resume analysis, personalized internship recommendations, and interview preparation.</p>
+        
+        <div class="auth-buttons">
+            {% if session.user_id %}
+                <a href="{{ url_for('dashboard_redirect') }}" class="auth-button primary">Go to Dashboard →</a>
+            {% else %}
+                <a href="{{ url_for('login') }}" class="auth-button primary">Sign In →</a>
+                <a href="{{ url_for('register') }}" class="auth-button secondary">Create Account</a>
+            {% endif %}
+        </div>
+    </div>
+</div>
+
+<div class="features-section">
+    <h2 class="features-title" style="color:#D4AF37">What You Can Do</h2>
+    <p class="features-subtitle" style="color:silver">Comprehensive career tools powered by AI</p>
+    
+    <div class="features-grid">
+        <div class="feature-card">
+            <div class="feature-icon">📊</div>
+            <h3>Resume Analysis</h3>
+            <p>Get detailed insights into your resume including skill scores, improvements needed, and portfolio recommendations.</p>
+        </div>
+        
+        <div class="feature-card">
+            <div class="feature-icon">💼</div>
+            <h3>Internship Finder</h3>
+            <p>Discover personalized internship opportunities that match your skill level and academic background.</p>
+        </div>
+        
+        <div class="feature-card">
+            <div class="feature-icon">🎤</div>
+            <h3>Interview Prep</h3>
+            <p>Practice with AI-generated interview questions tailored to your skills and get expert feedback.</p>
+        </div>
+        <div class="feature-card">
+            <div class="feature-icon">🚀</div>
+            <h3>Career Alignment</h3>
+            <p>Harmoniously integrating your core strengths, passions, and values with long-term professional opportunities to achieve sustainable growth, and a great career.</p>
+        </div>
+    </div>
+</div>
+
+<div class="cta-section">
+    <h2 style="color:#D4AF37">Ready to Level Up Your Career?</h2>
+    <p style="color:silver">Join thousands of students using Internova to land their dream internships.</p>
+    {% if session.user_id %}
+        <a href="{{ url_for('dashboard_redirect') }}" class="auth-button primary">Go to Dashboard →</a>
+    {% else %}
+        <a href="{{ url_for('login') }}" class="auth-button primary">Get Started Now →</a>
+    {% endif %}
+</div>
+
+{% endblock %}

@@ -1,0 +1,654 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<style>
+    .resume-hero {
+        background: linear-gradient(135deg, rgba(103, 80, 164, 0.1) 0%, rgba(232, 222, 248, 0.2) 100%);
+        border-radius: 1.5rem;
+        padding: 2rem 1.5rem;
+        margin: 1.5rem 0;
+        position: relative;
+        overflow: hidden;
+        animation: slideInDown 0.6s cubic-bezier(0.2, 0, 0, 1);
+        text-align: center;
+    }
+    
+    @media (min-width: 768px) {
+        .resume-hero {
+            padding: 4rem 2.5rem;
+            margin: 2.5rem 0;
+            border-radius: 2rem;
+            text-align: left;
+        }
+    }
+
+    .resume-hero h1 {
+        font-size: clamp(1.5rem, 5vw, 2rem);
+        font-weight: 500;
+        color: var(--md-primary);
+        margin-bottom: 1rem;
+    }
+
+    .breadcrumb {
+        display: flex;
+        align-items: center;
+        flex-wrap: wrap;
+        gap: 0.75rem;
+        margin-bottom: 1rem;
+        animation: fadeIn 0.4s cubic-bezier(0.2, 0, 0, 1);
+    }
+    
+    @media (min-width: 768px) {
+        .breadcrumb { margin-bottom: 1.5rem; }
+    }
+
+    .breadcrumb a {
+        color: var(--md-primary);
+        text-decoration: none;
+        font-weight: 500;
+        transition: all 300ms cubic-bezier(0.2, 0, 0, 1);
+    }
+
+    .breadcrumb a:hover {
+        color: var(--md-on-background);
+    }
+    
+    .resume-header-actions {
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+        align-items: flex-start;
+        padding: 1.25rem 0;
+        margin: 1.25rem 0;
+        gap: 1rem;
+    }
+    
+    @media (min-width: 768px) {
+        .resume-header-actions {
+            flex-direction: row;
+            align-items: center;
+        }
+    }
+
+    .feature-buttons {
+        display: grid;
+        grid-template-columns: 1fr;
+        gap: 1rem;
+        margin: 2rem 0;
+    }
+    
+    @media (min-width: 576px) {
+        .feature-buttons { grid-template-columns: repeat(2, 1fr); }
+    }
+    
+    @media (min-width: 1024px) {
+        .feature-buttons { grid-template-columns: repeat(3, 1fr); }
+    }
+
+    .feature-button {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        padding: 1.5rem;
+        border: 2px solid var(--md-outline-variant);
+        border-radius: 1rem;
+        cursor: pointer;
+        transition: all 300ms cubic-bezier(0.2, 0, 0, 1);
+        text-decoration: none;
+        color: #D4AF37;
+        animation: slideInUp 0.5s cubic-bezier(0.2, 0, 0, 1);
+        background: rgba(212, 175, 55, 0.05);
+        border-color: rgba(212, 175, 55, 0.6);
+        position: relative;
+        overflow: hidden;
+        min-height: 44px; /* Touch target */
+    }
+
+    .feature-button:nth-child(1) { animation-delay: 0.1s; }
+    .feature-button:nth-child(2) { animation-delay: 0.2s; }
+    .feature-button:nth-child(3) { animation-delay: 0.3s; }
+
+    .feature-button:hover {
+        transform: translateY(-4px);
+        border-color: #D4AF37;
+        background: rgba(212, 175, 55, 0.1);
+        color: #D4AF37;
+        box-shadow: 0 8px 24px rgba(212, 175, 55, 0.2);
+    }
+
+    .feature-button-icon {
+        font-size: 2.5rem;
+        margin-bottom: 0.75rem;
+    }
+
+    .feature-button-label {
+        font-weight: 600;
+        font-size: 1rem;
+        text-align: center;
+    }
+
+    .feature-button.featured {
+        background: rgba(212, 175, 55, 0.05);
+        border-color: rgba(212, 175, 55, 0.4);
+        position: relative;
+        overflow: hidden;
+    }
+
+    .feature-button.featured::before {
+        content: 'COMING SOON';
+        position: absolute;
+        top: 24px;
+        right: -35px;
+        background: #D4AF37;
+        color: #0A0A0A;
+        font-size: 0.65rem;
+        font-weight: 700;
+        padding: 4px 28px;
+        transform: rotate(45deg);
+        letter-spacing: 1px;
+        box-shadow: 0 2px 10px rgba(0,0,0,0.5);
+    }
+
+    .feature-button.featured:hover {
+        border-color: #D4AF37;
+        background: rgba(212, 175, 55, 0.1);
+        color: #D4AF37;
+        box-shadow: 0 8px 24px rgba(212, 175, 55, 0.2);
+    }
+
+    .content-grid {
+        display: grid;
+        grid-template-columns: 1fr;
+        gap: 1.5rem;
+        margin-top: 2rem;
+    }
+
+    @media (min-width: 768px) {
+        .content-grid {
+            grid-template-columns: 1fr 2fr;
+            gap: 2.5rem;
+            margin-top: 2.5rem;
+        }
+    }
+
+    .analysis-card {
+        background: var(--md-surface-container);
+        border-radius: 24px;
+        padding: 32px;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+        animation: scaleIn 0.5s cubic-bezier(0.2, 0, 0, 1);
+    }
+
+    .analysis-card h2 {
+        font-size: 1.375rem;
+        font-weight: 500;
+        color: var(--md-primary);
+        margin-bottom: 16px;
+    }
+
+    .score-display {
+        font-size: 3.5rem;
+        font-weight: 700;
+        color: var(--md-primary);
+        line-height: 1;
+        margin-bottom: 8px;
+    }
+
+    .score-label {
+        font-size: 0.875rem;
+        color: var(--md-on-surface-variant);
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        font-weight: 600;
+    }
+
+    .analysis-content {
+        display: flex;
+        flex-direction: column;
+        gap: 24px;
+    }
+
+    .analysis-item {
+        animation: slideInUp 0.4s cubic-bezier(0.2, 0, 0, 1);
+    }
+
+    .analysis-item:nth-child(1) { animation-delay: 0.1s; }
+    .analysis-item:nth-child(2) { animation-delay: 0.2s; }
+    .analysis-item:nth-child(3) { animation-delay: 0.3s; }
+    .analysis-item:nth-child(4) { animation-delay: 0.4s; }
+
+    .analysis-item h3 {
+        font-size: 1.125rem;
+        font-weight: 600;
+        color: var(--md-on-background);
+        margin-bottom: 12px;
+    }
+
+    .analysis-item p {
+        color: var(--md-on-surface-variant);
+        line-height: 1.6;
+    }
+
+    .list-item {
+        background: var(--md-surface-container-low);
+        padding: 12px 16px;
+        border-radius: 12px;
+        margin-bottom: 8px;
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        transition: all 300ms cubic-bezier(0.2, 0, 0, 1);
+    }
+
+    .list-item:hover {
+        background: var(--md-surface-container);
+        transform: translateX(4px);
+    }
+
+    .list-item-icon {
+        font-size: 1.25rem;
+    }
+
+    .list-item-text {
+        color: var(--md-on-background);
+        font-size: 0.95rem;
+    }
+
+    .link-group {
+        display: inline-flex;
+        flex-wrap: wrap;
+        gap: 8px;
+        margin-top: 8px;
+    }
+
+    .resource-link {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        padding: 8px 16px;
+        background:#D4AF37;
+        color: #0A0A0A;
+        text-decoration: none;
+        border-radius: 9999px;
+        font-size: 0.875rem;
+        font-weight: 600;
+        transition: all 300ms cubic-bezier(0.2, 0, 0, 1);
+    }
+
+    .resource-link:hover {
+        background: rgba(212, 175, 55, 0.9);
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(212, 175, 55, 0.3);
+    }
+
+    .loading-spinner {
+        display: inline-block;
+        width: 40px;
+        height: 40px;
+        border: 4px solid rgba(103, 80, 164, 0.2);
+        border-radius: 50%;
+        border-top-color: var(--md-primary);
+        animation: spin 1s linear infinite;
+        margin: 40px auto;
+    }
+
+    @keyframes spin {
+        to { transform: rotate(360deg); }
+    }
+
+    .btn-spinner {
+        width: 18px;
+        height: 18px;
+        border: 3px solid rgba(10, 10, 10, 0.3);
+        border-bottom-color: #0A0A0A;
+        border-radius: 50%;
+        box-sizing: border-box;
+        animation: spin 1s linear infinite;
+    }
+
+    .container-main {
+        max-width: 1200px;
+        margin: 0 auto;
+        padding: 0 var(--spacing-lg);
+    }
+</style>
+
+<div class="container-main">
+    <div class="resume-header-actions">
+        <div class="breadcrumb" style="padding: 0; margin: 0;">
+            <a href="{{ url_for('dashboard', user_id=user.id) }}">📁 Dashboard</a>
+            <span>&gt;</span>
+            <span style="color: var(--md-on-surface-variant);">{{ resume.filename }}</span>
+        </div>
+        <button onclick="deleteResume({{ resume.id }})" style="background: rgba(244, 67, 54, 0.1); color: #C62828; border: 1px solid rgba(244, 67, 54, 0.4); padding: 8px 16px; border-radius: 9999px; cursor: pointer; font-weight: 600; font-size: 0.9rem; transition: all 300ms; min-height: 44px;">
+            🗑️ Delete Resume
+        </button>
+    </div>
+
+    <div class="resume-hero">
+        <h1 style="color:#D4AF37">📊 Resume Analysis</h1>
+        <p style="color: white;">Get a comprehensive career assessment including skills analysis, internship recommendations, and interview preparation.</p>
+    </div>
+
+    <div id="loading-state">
+        <div style="text-align: center; padding: 60px 20px;">
+            <div class="loading-spinner"></div>
+            <p style="margin-top: 24px; color: var(--md-on-surface-variant); font-size: 1rem;">Analyzing your resume...</p>
+        </div>
+    </div>
+
+    <div id="analysis-results" style="display: none;">
+        <!-- Feature Buttons -->
+        {% if not resume.internships_result %}
+        <div style="text-align: center; margin-top: 32px; animation: slideInUp 0.5s cubic-bezier(0.2, 0, 0, 1);">
+            <button id="generateBtn" onclick="generateAllContent({{ resume.id }})" style="display: inline-flex; align-items: center; justify-content: center; gap: 8px; background: #D4AF37; color: #0A0A0A; border: none; padding: 14px 28px; font-size: 1.1rem; font-weight: 600; border-radius: 9999px; cursor: pointer; transition: all 300ms; box-shadow: 0 4px 12px rgba(212, 175, 55, 0.3);">
+                <span id="btnText">Generate Additional Details (1 Credit)</span>
+                <div id="btnSpinner" class="btn-spinner" style="display: none;"></div>
+            </button>
+            <p style="color: var(--md-on-surface-variant); font-size: 0.9rem; margin-top: 12px;">Unlocks Internships, Interview Prep, AI Roadmap, and Alignment</p>
+        </div>
+        <div class="feature-buttons" style="opacity: 0.4; pointer-events: none; filter: grayscale(50%);">
+        {% else %}
+        <div class="feature-buttons">
+        {% endif %}
+            <a href="{{ url_for('internship_finder', resume_id=resume.id) }}" class="feature-button">
+                <div class="feature-button-icon">💼</div>
+                <div class="feature-button-label">Find Internships</div>
+            </a>
+            <a href="{{ url_for('mock_interview_questions_page', resume_id=resume.id) }}" class="feature-button">
+                <div class="feature-button-icon">🎤</div>
+                <div class="feature-button-label">Interview Prep</div>
+            </a>
+            <a href="{{ url_for('roadmap_page', resume_id=resume.id) }}" class="feature-button">
+                <div class="feature-button-icon">🗺️</div>
+                <div class="feature-button-label">AI Roadmap</div>
+            </a>
+            <a href="{{ url_for('career_alignment_page', resume_id=resume.id) }}" class="feature-button">
+                <div class="feature-button-icon">⚖️</div>
+                <div class="feature-button-label">Career Alignment</div>
+            </a>
+            <a href="{{ url_for('virtual_office', resume_id=resume.id) }}" class="feature-button featured">
+                <div class="feature-button-icon">🏢</div>
+                <div class="feature-button-label">Virtual Office</div>
+            </a>
+            <a href="{{ url_for('in_app_internships', resume_id=resume.id) }}" class="feature-button featured">
+                <div class="feature-button-icon">🤝</div>
+                <div class="feature-button-label">Partner Internships</div>
+            </a>
+        </div>
+
+        <!-- Content Grid -->
+        <div class="content-grid">
+            <div class="analysis-card">
+                <h2 style="color:#D4AF37">Skill Score</h2>
+                <div style="display: flex; align-items: baseline; gap: 12px;">
+                    <div class="score-display" style="color:#D4AF37;font-weight:500;" id="score-display"></div>
+                    {% if resume.parent_resume_id %}
+                    <div id="score-change-display" style="font-size: 1.5rem; font-weight: 600;"></div>
+                    {% endif %}
+                </div>
+                <div class="score-label">Out of 100</div>
+
+                <!-- Version History & Re-upload -->
+                <div style="margin-top: 2rem; border-top: 1px solid rgba(212, 175, 55, 0.2); padding-top: 1.5rem;">
+                    <h3 style="color: var(--md-on-background); font-size: 1.1rem; margin-bottom: 1rem; font-family: 'Marcellus', serif;">Version History</h3>
+                    <div style="display: flex; flex-direction: column; gap: 0.5rem; margin-bottom: 1.5rem; max-height: 250px; overflow-y: auto;">
+                        {% for h in history %}
+                        <a href="{{ url_for('view_resume', resume_id=h.id) }}" class="list-item" style="text-decoration: none; position: relative; overflow: hidden; {% if h.id == resume.id %}border: 1px solid rgba(212, 175, 55, 0.6); background: rgba(212, 175, 55, 0.05);{% endif %}">
+                            <span class="list-item-icon">📄</span>
+                            <div style="flex: 1;">
+                                <div class="list-item-text">
+                                    <strong style="color: #D4AF37;">Version {{ h.version }}</strong> 
+                                    {% if h.score != 'N/A' %} <span style="font-size: 0.85rem; color: silver; float: right; margin-top: 2px;">Score: {{ h.score }}</span>{% endif %}
+                                </div>
+                                <div style="font-size: 0.8rem; color: var(--md-on-surface-variant);">{{ h.date }}</div>
+                            </div>
+                        </a>
+                        {% endfor %}
+                    </div>
+                    
+                    <form action="{{ url_for('upload_version', parent_resume_id=resume.id) }}" method="POST" enctype="multipart/form-data" style="display: flex; flex-direction: column; gap: 1rem;">
+                        <input type="file" name="resume_file" accept=".pdf,.docx" required style="color: silver; font-size: 0.9rem; padding: 10px; border: 1px dashed rgba(212, 175, 55, 0.4); border-radius: 8px; background: rgba(10, 10, 10, 0.5);" />
+                        <button type="submit" class="btn-primary" style="width: 100%; min-height: 44px; display: inline-flex; justify-content: center; align-items: center;">Upload Improved Version</button>
+                    </form>
+                </div>
+            </div>
+
+            <!-- Version Comparison Card -->
+            <div class="analysis-card" id="version-comparison-card" style="display: none;">
+                <div class="analysis-content">
+                    <div class="analysis-item">
+                        <h3 style="color: #4CAF50;">✅ Changes Applied</h3>
+                        <div id="applied-feedback-list"></div>
+                    </div>
+                    
+                    <div class="analysis-item">
+                        <h3 style="color: #D4AF37;">⚠️ Still Missing</h3>
+                        <div id="ignored-feedback-list"></div>
+                    </div>
+
+                    <div class="analysis-item">
+                        <h3>🎯 Next Steps</h3>
+                        <div id="vc-roadmap-list"></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Standard Dashboard Card -->
+            <div class="analysis-card" id="standard-dashboard-card" style="display: none;">
+                <div class="analysis-content">
+                    <div class="analysis-item">
+                        <h3>💼 Reality Check</h3>
+                        <p id="why-not-hired"></p>
+                    </div>
+
+                    <div class="analysis-item">
+                        <h3>🎯 Your Roadmap</h3>
+                        <div id="roadmap-list"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Skills to Improve -->
+        <div class="analysis-card mt-xl" id="skills-improve-card" style="margin-top: 32px; display: none;">
+            <h2>🚀 Skills to Improve</h2>
+            <div id="skills-improve-list"></div>
+        </div>
+
+        <!-- Portfolio Suggestions -->
+        <div class="analysis-card" id="portfolio-design-card" style="margin-top: 32px; display: none;">
+            <h2>🎨 Portfolio Design</h2>
+            <p style="color: var(--md-on-surface-variant); margin-bottom: 16px;">Current Rating: <strong id="portfolio-rating" style="color: var(--md-primary);"></strong></p>
+            <div style="display: flex; flex-direction: column; gap: 12px;" id="portfolio-suggestions"></div>
+        </div>
+    </div>
+</div>
+
+<script>
+    async function deleteResume(resumeId) {
+        if (confirm("Are you sure you want to delete this resume? This action cannot be undone.")) {
+            try {
+                const response = await fetch('{{ url_for("api_delete_resume", resume_id=0) }}'.replace('0', resumeId), {
+                    method: 'DELETE'
+                });
+                if (response.ok) {
+                    window.location.href = '{{ url_for("dashboard", user_id=user.id) }}';
+                } else {
+                    const data = await response.json();
+                    alert(data.error || "Failed to delete resume.");
+                }
+            } catch (err) {
+                alert("Network error: " + err);
+            }
+        }
+    }
+
+    async function generateAllContent(resumeId) {
+        const btn = document.getElementById('generateBtn');
+        const btnText = document.getElementById('btnText');
+        const btnSpinner = document.getElementById('btnSpinner');
+
+        // Show loading animation & disable button
+        btn.disabled = true;
+        btnText.innerText = "Generating AI Content... Please wait ";
+        btnSpinner.style.display = "inline-block";
+        btn.style.opacity = "0.7";
+        btn.style.cursor = "not-allowed";
+
+        try {
+            const response = await fetch('{{ url_for("api_generate_advanced_content", resume_id=0) }}'.replace('0', resumeId), {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' }
+            });
+
+            const data = await response.json();
+
+            if (response.ok && data.success) {
+                // Auto-update the credits in the UI before reload
+                const creditsEl = document.getElementById('nav-credit-count');
+                if (creditsEl) creditsEl.innerText = data.credits_remaining;
+                
+                // Instantly reload to display unlocked features
+                window.location.reload();
+            } else {
+                alert(data.error || "An error occurred while generating content.");
+                resetButtonUI(btn, btnText, btnSpinner);
+            }
+        } catch (err) {
+            alert("A network error occurred: " + err);
+            resetButtonUI(btn, btnText, btnSpinner);
+        }
+    }
+
+    function resetButtonUI(btn, btnText, btnSpinner) {
+        btn.disabled = false;
+        btnText.innerText = "Generate Additional Details (1 Credit)";
+        btnSpinner.style.display = "none";
+        btn.style.opacity = "1";
+        btn.style.cursor = "pointer";
+    }
+
+    function getDomainName(urlStr) {
+        try {
+            if (!urlStr.startsWith('http://') && !urlStr.startsWith('https://')) {
+                urlStr = 'https://' + urlStr;
+            }
+            const url = new URL(urlStr);
+            let domain = url.hostname.replace(/^www\./, '').split('.')[0];
+            return domain.charAt(0).toUpperCase() + domain.slice(1);
+        } catch (e) {
+            return "Learn More";
+        }
+    }
+
+    document.addEventListener("DOMContentLoaded", async function() {
+        const resumeId = "{{ resume.id }}";
+        
+        try {
+            const res = await fetch(`{{ url_for('analyze_profile', resume_id=resume.id) }}`, { method: 'POST' });
+            const data = await res.json();
+            
+            document.getElementById('loading-state').style.display = 'none';
+            document.getElementById('analysis-results').style.display = 'block';
+            
+            // Score
+            document.getElementById('score-display').innerText = data.skill_score !== undefined ? data.skill_score : data.new_skill_score;
+            
+            // Contextual Versioning UI logic
+            const changeDisplay = document.getElementById('score-change-display');
+            if (data.score_change && changeDisplay) {
+                changeDisplay.innerText = `(${data.score_change})`;
+                if (data.score_change.startsWith('+')) changeDisplay.style.color = '#4CAF50';
+                else if (data.score_change.startsWith('-')) changeDisplay.style.color = '#D4AF37';
+                else changeDisplay.style.color = 'silver';
+            }
+            
+            if (data.is_version_comparison) {
+                document.getElementById('version-comparison-card').style.display = 'block';
+                
+                if (data.applied_feedback && data.applied_feedback.length > 0) {
+                    document.getElementById('applied-feedback-list').innerHTML = data.applied_feedback.map(item => `
+                        <div class="list-item" style="border-left: 3px solid #4CAF50;">
+                            <span class="list-item-icon">✅</span>
+                            <span class="list-item-text">${item}</span>
+                        </div>
+                    `).join('');
+                } else {
+                    document.getElementById('applied-feedback-list').innerHTML = '<p style="color: silver;">No applied changes detected.</p>';
+                }
+                
+                if (data.ignored_feedback && data.ignored_feedback.length > 0) {
+                    document.getElementById('ignored-feedback-list').innerHTML = data.ignored_feedback.map(item => `
+                        <div class="list-item" style="border-left: 3px solid #D4AF37;">
+                            <span class="list-item-icon">⚠️</span>
+                            <span class="list-item-text">${item}</span>
+                        </div>
+                    `).join('');
+                } else {
+                    document.getElementById('ignored-feedback-list').innerHTML = '<p style="color: silver;">No missed feedback detected.</p>';
+                }
+                
+                if (data.next_steps && data.next_steps.length > 0) {
+                    document.getElementById('vc-roadmap-list').innerHTML = data.next_steps.map((step, i) => `
+                        <div class="list-item">
+                            <span class="list-item-icon">✓</span>
+                            <span class="list-item-text">${step}</span>
+                        </div>
+                    `).join('');
+                }
+            } else {
+                // Standard Dashboard UI
+                document.getElementById('standard-dashboard-card').style.display = 'block';
+                document.getElementById('skills-improve-card').style.display = 'block';
+                document.getElementById('portfolio-design-card').style.display = 'block';
+                
+                document.getElementById('why-not-hired').innerText = data.why_not_hired;
+                
+                if (data.roadmap && data.roadmap.length > 0) {
+                    document.getElementById('roadmap-list').innerHTML = data.roadmap.map((step, i) => `
+                        <div class="list-item">
+                            <span class="list-item-icon">✓</span>
+                            <span class="list-item-text">${step}</span>
+                        </div>
+                    `).join('');
+                }
+                
+                if (data.skills_to_improve && data.skills_to_improve.length > 0) {
+                    document.getElementById('skills-improve-list').innerHTML = data.skills_to_improve.map(item => {
+                        let links = item.learning_links.map(link => `<a href="${link}" target="_blank" class="resource-link">${getDomainName(link)} →</a>`).join('');
+                        return `
+                            <div class="list-item">
+                                <span class="list-item-icon">📚</span>
+                                <div style="flex: 1;">
+                                    <div class="list-item-text"><strong>${item.skill}</strong></div>
+                                    <div class="link-group">${links}</div>
+                                </div>
+                            </div>
+                        `;
+                    }).join('');
+                }
+                
+                document.getElementById('portfolio-rating').innerText = data.portfolio_design_rating || "N/A";
+                if (data.portfolio_suggestions && data.portfolio_suggestions.length > 0) {
+                    document.getElementById('portfolio-suggestions').innerHTML = data.portfolio_suggestions.map(s => `
+                        <a href="${s}" target="_blank" style="width:250px;" class="resource-link">
+                            ${getDomainName(s)}
+                        </a>
+                    `).join('');
+                }
+            }
+        } catch (err) {
+            document.getElementById('loading-state').innerHTML = `
+                <div style="text-align: center; padding: 60px 20px;">
+                    <div style="font-size: 3rem; margin-bottom: 16px;">❌</div>
+                    <h2 style="color: var(--md-error);">Analysis Error</h2>
+                    <p style="color: var(--md-on-surface-variant);">Could not complete the assessment. Please try again or contact support.</p>
+                </div>
+            `;
+        }
+    });
+</script>
+
+{% endblock %}

@@ -1,0 +1,382 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<style>
+    .options-wrapper {
+        max-width: 900px;
+        margin: 2rem auto;
+        background: #141414;
+        border: 1px solid rgba(212, 175, 55, 0.3);
+        box-shadow: 0 0 20px rgba(212, 175, 55, 0.05);
+        padding: 1.5rem;
+        text-align: center;
+        border-radius: 1rem;
+    }
+
+    @media (min-width: 768px) {
+        .options-wrapper {
+            margin: 2.5rem auto;
+            padding: 2.5rem;
+        }
+    }
+
+    .options-container {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 1rem;
+        justify-content: center;
+        margin-top: 2rem;
+    }
+
+    .option-btn {
+        background: transparent;
+        border: 2px solid #D4AF37;
+        color: #D4AF37;
+        padding: 0.75rem 1.5rem;
+        font-family: 'Marcellus', serif;
+        font-size: 1rem;
+        text-transform: uppercase;
+        letter-spacing: 0.1em;
+        cursor: pointer;
+        transition: all 400ms ease;
+        border-radius: 0.75rem;
+        min-height: 44px; /* Touch target */
+    }
+
+    @media (min-width: 768px) {
+        .option-btn { font-size: 1.1rem; }
+    }
+
+    .option-btn:hover {
+        background: #D4AF37;
+        color: #0A0A0A;
+        box-shadow: 0 0 20px rgba(212, 175, 55, 0.4);
+        transform: translateY(-2px);
+    }
+
+    .chat-container {
+        max-width: 900px;
+        margin: 0 auto 2.5rem auto;
+        background: #141414;
+        border: 1px solid rgba(212, 175, 55, 0.3);
+        box-shadow: 0 0 20px rgba(212, 175, 55, 0.05);
+        display: flex;
+        flex-direction: column;
+        min-height: 500px;
+        position: relative;
+        border-radius: 1rem;
+        overflow: hidden;
+    }
+
+    .chat-header {
+        padding: 1.25rem 1.5rem;
+        border-bottom: 1px solid rgba(212, 175, 55, 0.2);
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        background: rgba(10, 10, 10, 0.5);
+    }
+
+    .chat-header h1, .chat-header h2 {
+        margin: 0;
+        font-size: clamp(1.25rem, 5vw, 1.5rem);
+        color: #D4AF37;
+        font-family: 'Marcellus', serif;
+    }
+
+    .roadmap-content-wrapper {
+        max-width: 900px;
+        margin: 0 auto;
+        background: #141414;
+        border: 1px solid rgba(212, 175, 55, 0.3);
+        border-bottom: none;
+        padding: 1.5rem;
+        color: silver;
+        line-height: 1.6;
+        border-radius: 1rem 1rem 0 0;
+    }
+    
+    @media (min-width: 768px) {
+        .roadmap-content-wrapper { padding: 2.5rem; }
+    }
+
+    .roadmap-content-wrapper h3 { color: #D4AF37; margin-top: 1.5rem; font-family: 'Marcellus', serif;}
+    .roadmap-content-wrapper ul { margin-bottom: 1rem; padding-left: 1.25rem; }
+    .roadmap-content-wrapper li { margin-bottom: 0.5rem; }
+    .roadmap-content-wrapper p { margin-bottom: 1rem; }
+
+    .chat-messages {
+        flex: 1;
+        padding: 1.5rem;
+        overflow-y: auto;
+        display: flex;
+        flex-direction: column;
+        gap: 1.25rem;
+    }
+
+    .message {
+        max-width: 90%;
+        padding: 1rem 1.25rem;
+        line-height: 1.6;
+        position: relative;
+        border-radius: 1rem;
+    }
+    
+    @media (min-width: 768px) {
+        .message { max-width: 80%; }
+    }
+
+    .ai-message {
+        align-self: flex-start;
+        background: rgba(212, 175, 55, 0.05);
+        border-left: 2px solid #D4AF37;
+        color: silver;
+        border-top-left-radius: 0;
+    }
+
+    .ai-message strong {
+        color: #D4AF37;
+    }
+
+    .user-message {
+        align-self: flex-end;
+        background: rgba(30, 61, 89, 0.3);
+        border-right: 2px solid #1E3D59;
+        color: #F2F0E4;
+        border-top-right-radius: 0;
+    }
+
+    .chat-input-area {
+        padding: 1.25rem;
+        border-top: 1px solid rgba(212, 175, 55, 0.2);
+        background: rgba(10, 10, 10, 0.5);
+        display: flex;
+        gap: 0.75rem;
+        flex-direction: column;
+    }
+    
+    @media (min-width: 768px) {
+        .chat-input-area { flex-direction: row; padding: 1.5rem; gap: 1rem; }
+    }
+
+    .chat-input {
+        flex: 1;
+        background: transparent;
+        border: none;
+        border-bottom: 2px solid #D4AF37;
+        color: #F2F0E4;
+        font-family: 'Josefin Sans', sans-serif;
+        font-size: 1rem;
+        padding: 0.5rem 0.75rem;
+        transition: all 300ms;
+        min-height: 44px; /* Touch target */
+    }
+
+    .chat-input:focus {
+        outline: none;
+        border-bottom-color: #F2E8C4;
+        box-shadow: 0 4px 10px rgba(212, 175, 55, 0.1);
+    }
+
+    .chat-input::placeholder {
+        color: #888888;
+    }
+
+    .typing-indicator {
+        display: none;
+        align-self: flex-start;
+        color: #D4AF37;
+        font-style: italic;
+        font-size: 0.9rem;
+        padding-left: 1.5rem;
+        margin-bottom: 0.75rem;
+    }
+
+    .spinner {
+        border: 4px solid rgba(212, 175, 55, 0.2); 
+        border-top-color: #D4AF37; 
+        border-radius: 50%; 
+        width: 2.5rem; 
+        height: 2.5rem; 
+        animation: spin 1s linear infinite; 
+        margin: 1.5rem auto;
+    }
+    @keyframes spin { 100% { transform: rotate(360deg); } }
+    
+    #send-btn {
+        width: 100%;
+    }
+    @media (min-width: 768px) {
+        #send-btn { width: auto; }
+    }
+</style>
+
+<div class="container-main" style="padding: 0 20px;">
+    <div class="breadcrumb" style="padding: 20px 0; display: flex; gap: 12px;">
+        <a href="{{ url_for('view_resume', resume_id=resume.id) }}" style="color: #D4AF37; text-decoration: none;">← Back to Analysis</a>
+    </div>
+
+    <!-- Step 1: Options -->
+    <div id="options-section" class="options-wrapper">
+        <h1 style="color: #D4AF37; font-family: 'Marcellus', serif; margin:0; font-size:2rem;">🗺️ Select Career Path</h1>
+        <p style="color: silver; margin-top: 12px;" id="options-subtitle">Analyzing your profile to generate optimal career trajectories...</p>
+        
+        <div id="options-loading" class="spinner"></div>
+        
+        <div id="options-buttons" class="options-container" style="display: none;">
+            <!-- Buttons injected via JS -->
+        </div>
+    </div>
+
+    <!-- Step 2: Roadmap Loading -->
+    <div id="roadmap-loading-section" class="options-wrapper" style="display: none;">
+        <h1 style="color: #D4AF37; font-family: 'Marcellus', serif; margin:0; font-size:2rem;">Building Roadmap</h1>
+        <p style="color: silver; margin-top: 12px;" id="roadmap-target-text">Generating specific steps...</p>
+        <div class="spinner"></div>
+    </div>
+
+    <!-- Step 3: Roadmap + Chat Display -->
+    <div id="roadmap-display-section" style="display: none;">
+        
+        <div class="roadmap-content-wrapper">
+            <h1 id="roadmap-title" style="color: #D4AF37; font-family: 'Marcellus', serif; margin: 0 0 24px 0; font-size:2rem; text-align:center;">Your Roadmap</h1>
+            <div id="roadmap-html-content"></div>
+        </div>
+
+        <div class="chat-container">
+            <div class="chat-header">
+                <h2>💬 Discuss Your Roadmap</h2>
+            </div>
+            
+            <div class="chat-messages" id="chat-messages">
+                <div class="message ai-message">
+                    Here is your generated roadmap above! I am your AI Career Strategist. Do you have any specific questions about these steps or need help tackling a particular skill?
+                </div>
+            </div>
+            
+            <div class="typing-indicator" id="typing-indicator">Mentor is typing...</div>
+            
+            <div class="chat-input-area">
+                <input type="text" id="chat-input" class="chat-input" placeholder="Ask about specific steps or skills..." onkeypress="handleKeyPress(event)">
+                <button onclick="sendMessage()" class="btn-primary" id="send-btn">Send</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', fetchOptions);
+
+    let chatHistory = "";
+    let selectedCareer = "";
+
+    async function fetchOptions() {
+        try {
+            const res = await fetch('{{ url_for("api_roadmap_options", resume_id=resume.id) }}');
+            const data = await res.json();
+            
+            if (!res.ok && data.requires_generation) {
+                document.getElementById('options-loading').style.display = 'none';
+                document.getElementById('options-subtitle').innerHTML = "<span style='color:#C62828;'>Additional details not generated yet. Please go back to the Resume page and click 'Generate Advanced Features' to unlock this section.</span>";
+                return;
+            }
+            
+            document.getElementById('options-loading').style.display = 'none';
+            document.getElementById('options-subtitle').innerText = "Based on your resume, select a path to generate a detailed roadmap:";
+            
+            const btnContainer = document.getElementById('options-buttons');
+            btnContainer.style.display = 'flex';
+            
+            if(data.options && data.options.length > 0) {
+                data.options.forEach(opt => {
+                    const btn = document.createElement('button');
+                    btn.className = 'option-btn';
+                    btn.innerText = opt;
+                    btn.onclick = () => selectOption(opt);
+                    btnContainer.appendChild(btn);
+                });
+            } else {
+                btnContainer.innerHTML = "<p style='color:silver;'>Could not generate options.</p>";
+            }
+        } catch (e) {
+            document.getElementById('options-subtitle').innerText = "Error loading options.";
+            document.getElementById('options-loading').style.display = 'none';
+        }
+    }
+
+    async function selectOption(option) {
+        selectedCareer = option;
+        document.getElementById('options-section').style.display = 'none';
+        document.getElementById('roadmap-loading-section').style.display = 'block';
+        document.getElementById('roadmap-target-text').innerText = `Generating specific steps for ${option}...`;
+
+        try {
+            const res = await fetch('{{ url_for("api_roadmap_generate", resume_id=resume.id) }}', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ option: option })
+            });
+            const data = await res.json();
+            
+            document.getElementById('roadmap-loading-section').style.display = 'none';
+            document.getElementById('roadmap-display-section').style.display = 'block';
+            
+            document.getElementById('roadmap-title').innerText = `Your Roadmap to ${option}`;
+            document.getElementById('roadmap-html-content').innerHTML = data.roadmap;
+            
+            chatHistory += `System: User selected the career path: ${option}. Roadmap was generated.\n`;
+        } catch(e) {
+            document.getElementById('roadmap-target-text').innerText = "Error generating roadmap.";
+        }
+    }
+
+    function handleKeyPress(e) {
+        if (e.key === 'Enter') {
+            sendMessage();
+        }
+    }
+
+    async function sendMessage() {
+        const input = document.getElementById('chat-input');
+        const message = input.value.trim();
+        if (!message) return;
+
+        const messagesDiv = document.getElementById('chat-messages');
+        
+        // Add User Message
+        messagesDiv.innerHTML += `<div class="message user-message">${message}</div>`;
+        chatHistory += `Candidate: ${message}\n`;
+        input.value = '';
+        messagesDiv.scrollTop = messagesDiv.scrollHeight;
+
+        // Show typing
+        const typingIndicator = document.getElementById('typing-indicator');
+        const sendBtn = document.getElementById('send-btn');
+        typingIndicator.style.display = 'block';
+        input.disabled = true;
+        sendBtn.disabled = true;
+
+        try {
+            const response = await fetch('{{ url_for("api_roadmap_chat", resume_id=resume.id) }}', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ message: message, history: chatHistory })
+            });
+            const data = await response.json();
+            
+            // Add AI Message
+            let aiText = data.reply.replace(/\n/g, '<br>');
+            messagesDiv.innerHTML += `<div class="message ai-message">${aiText}</div>`;
+            chatHistory += `Mentor: ${data.reply}\n`;
+        } catch (e) {
+            messagesDiv.innerHTML += `<div class="message ai-message" style="color: red;">Connection error. Please try again.</div>`;
+        } finally {
+            typingIndicator.style.display = 'none';
+            input.disabled = false;
+            sendBtn.disabled = false;
+            input.focus();
+            messagesDiv.scrollTop = messagesDiv.scrollHeight;
+        }
+    }
+</script>
+{% endblock %}

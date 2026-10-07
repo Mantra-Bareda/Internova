@@ -1,0 +1,145 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<style>
+    .account-grid {
+        display: grid;
+        grid-template-columns: 1fr;
+        gap: 1.5rem;
+    }
+    
+    @media (min-width: 768px) {
+        .account-grid {
+            grid-template-columns: repeat(3, 1fr);
+        }
+        .account-grid.two-cols {
+            grid-template-columns: 1fr 1fr;
+        }
+    }
+
+    .form-group {
+        display: flex;
+        flex-direction: column;
+        gap: 0.5rem;
+    }
+
+    .form-group label {
+        color: #D4AF37;
+        font-family: 'Marcellus', serif;
+        font-size: 0.95rem;
+    }
+
+    .section-title {
+        color: #D4AF37;
+        font-family: 'Marcellus', serif;
+        font-size: 1.5rem;
+        margin-bottom: 1.5rem;
+        border-bottom: 1px solid rgba(212, 175, 55, 0.2);
+        padding-bottom: 0.5rem;
+    }
+
+    .account-container {
+        max-width: 900px;
+        margin: 0 auto;
+        padding: 2rem 1rem;
+    }
+    
+    .success-alert {
+        background: rgba(212, 175, 55, 0.1);
+        border: 1px solid #D4AF37;
+        color: #D4AF37;
+        padding: 1rem;
+        border-radius: 8px;
+        margin-bottom: 2rem;
+        text-align: center;
+        font-weight: bold;
+    }
+</style>
+
+<div class="account-container">
+    <h1 style="color: #D4AF37; font-family: 'Marcellus', serif; text-align: center; margin-bottom: 2rem;">Internova Profile</h1>
+
+    {% if success %}
+    <div class="success-alert">
+        Profile updated successfully!
+    </div>
+    {% endif %}
+
+    <form method="POST" action="{{ url_for('account') }}">
+        
+        <!-- Personal Info -->
+        <div class="card" style="margin-bottom: 2rem;">
+            <h2 class="section-title">Personal Info</h2>
+            <div class="account-grid" style="margin-bottom: 1.5rem;">
+                <div class="form-group">
+                    <label for="first_name">First Name</label>
+                    <input type="text" id="first_name" name="first_name" class="input-field" value="{{ profile.first_name if profile else '' }}" required>
+                </div>
+                <div class="form-group">
+                    <label for="middle_name">Middle Name (Optional)</label>
+                    <input type="text" id="middle_name" name="middle_name" class="input-field" value="{{ profile.middle_name if profile else '' }}">
+                </div>
+                <div class="form-group">
+                    <label for="last_name">Last Name</label>
+                    <input type="text" id="last_name" name="last_name" class="input-field" value="{{ profile.last_name if profile else '' }}" required>
+                </div>
+            </div>
+            
+            <div class="form-group" style="margin-bottom: 1.5rem;">
+                <label for="headline">Professional Headline</label>
+                <input type="text" id="headline" name="headline" class="input-field" placeholder="e.g. Senior Full-Stack Engineer" value="{{ profile.headline if profile else '' }}">
+            </div>
+
+            <div class="form-group">
+                <label for="bio">Professional Bio</label>
+                <textarea id="bio" name="bio" class="input-field" rows="4" placeholder="Tell us about yourself...">{{ profile.bio if profile else '' }}</textarea>
+            </div>
+        </div>
+
+        <!-- Professional Details -->
+        <div class="card" style="margin-bottom: 2rem;">
+            <h2 class="section-title">Professional Details</h2>
+            <div class="form-group" style="margin-bottom: 1.5rem;">
+                <label for="skills">Skills (Comma separated)</label>
+                <input type="text" id="skills" name="skills" class="input-field" placeholder="e.g. Python, React, AWS" value="{{ profile.skills if profile else '' }}">
+            </div>
+            
+            <div class="account-grid two-cols">
+                <div class="form-group">
+                    <label for="education_details">Education</label>
+                    <textarea id="education_details" name="education_details" class="input-field" rows="4" placeholder="e.g. B.S. Computer Science, University of Technology">{{ profile.education_details if profile else '' }}</textarea>
+                </div>
+                <div class="form-group">
+                    <label for="experience_details">Experience</label>
+                    <textarea id="experience_details" name="experience_details" class="input-field" rows="4" placeholder="e.g. Software Engineer at Tech Corp (2020-Present)">{{ profile.experience_details if profile else '' }}</textarea>
+                </div>
+            </div>
+        </div>
+
+        <!-- Links -->
+        <div class="card" style="margin-bottom: 2rem;">
+            <h2 class="section-title">External Links</h2>
+            <div class="account-grid">
+                <div class="form-group">
+                    <label for="linkedin_url">LinkedIn URL</label>
+                    <input type="url" id="linkedin_url" name="linkedin_url" class="input-field" placeholder="https://linkedin.com/in/username" value="{{ profile.linkedin_url if profile else '' }}">
+                </div>
+                <div class="form-group">
+                    <label for="github_url">GitHub URL</label>
+                    <input type="url" id="github_url" name="github_url" class="input-field" placeholder="https://github.com/username" value="{{ profile.github_url if profile else '' }}">
+                </div>
+                <div class="form-group">
+                    <label for="portfolio_url">Portfolio URL</label>
+                    <input type="url" id="portfolio_url" name="portfolio_url" class="input-field" placeholder="https://yourwebsite.com" value="{{ profile.portfolio_url if profile else '' }}">
+                </div>
+            </div>
+        </div>
+
+        <div style="text-align: center; margin-top: 2rem; margin-bottom: 4rem;">
+            <button type="submit" class="btn-primary" style="padding: 15px 40px; font-size: 1.1rem; width: 100%; max-width: 400px; display: inline-flex; justify-content: center; align-items: center; min-height: 44px;">
+                Save Profile
+            </button>
+        </div>
+    </form>
+</div>
+{% endblock %}

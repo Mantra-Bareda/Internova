@@ -1,0 +1,133 @@
+@import url('https://fonts.googleapis.com/css2?family=Marcellus&family=Josefin+Sans:wght@300;400;600&display=swap');
+
+/* --- THEME DEFINITIONS --- */
+:root {
+    /* ART DECO THEME */
+    --bg-base: #0A0A0A;
+    --bg-elevated: #141414;
+    --fg-primary: #F2F0E4;
+    --fg-muted: #888888;
+    --accent: #D4AF37;
+    --accent-secondary: #1E3D59;
+    --card-border: rgba(212, 175, 55, 0.3);
+    --shadow: 0 0 15px rgba(212, 175, 55, 0.15);
+}
+
+:root.light-theme {
+    /* THEME B: LIGHT MODE */
+    --bg-base: #F9F8F6;
+    --bg-elevated: #EBE5DE;
+    --fg-primary: #1A1A1A;
+    --fg-muted: #6C6863;
+    --accent: #D4AF37;
+    --card-border: rgba(0, 0, 0, 0.05);
+    --shadow: 0 10px 40px rgba(0, 0, 0, 0.04);
+}
+
+* {
+    box-sizing: border-box;
+    transition: background-color 0.4s ease, color 0.4s ease;
+}
+
+html {
+    overflow-x: clip;
+}
+
+body {
+    margin: 0;
+    font-family: 'Josefin Sans', sans-serif;
+    background-color: #0A0A0A;
+    background-image: 
+        linear-gradient(135deg, rgba(26, 11, 46, 0.95) 0%, rgba(0, 0, 0, 1) 100%),
+        linear-gradient(rgba(212, 175, 55, 0.05) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(212, 175, 55, 0.05) 1px, transparent 1px),
+        radial-gradient(circle, rgba(212, 175, 55, 0.15) 1px, transparent 1.5px);
+    background-size: 100% 100%, 40px 40px, 40px 40px, 40px 40px;
+    background-position: 0 0, 0 0, 0 0, -1px -1px;
+    background-attachment: fixed;
+    color: var(--fg-primary);
+    position: relative;
+    max-width: 100%;
+    overflow-x: clip;
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+}
+
+/* Headlines Vertical Gradient */
+h1, h2 {
+    font-family: 'Marcellus', serif;
+    text-transform: uppercase;
+    letter-spacing: 0.15em;
+    color: var(--accent);
+    text-shadow: 0 0 15px rgba(212, 175, 55, 0.2);
+}
+
+/* Base Card Styling */
+.card {
+    background-color: var(--bg-elevated);
+    border: 1px solid var(--card-border);
+    border-radius: 0px;
+    padding: 24px;
+    box-shadow: var(--shadow);
+    position: relative;
+    overflow: hidden;
+    transition: all 500ms ease-out;
+}
+
+.card:hover {
+    border-color: rgba(212, 175, 55, 1);
+    box-shadow: 0 0 20px rgba(212, 175, 55, 0.3);
+    transform: translateY(-4px);
+}
+
+/* THEME A SPOTLIGHT EFFECT (Controlled via JS) */
+:root:not(.light-theme) .card::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0; bottom: 0;
+    background: radial-gradient(800px circle at var(--mouse-x) var(--mouse-y), rgba(255,255,255,0.03), transparent 40%);
+    z-index: 0;
+    pointer-events: none;
+}
+
+/* Primary Button Styling with THEME B Hover Slide */
+.btn-primary {
+    background-color: transparent;
+    color: var(--accent);
+    border: 2px solid var(--accent);
+    padding: 12px 24px;
+    border-radius: 0px;
+    font-weight: 600;
+    font-family: 'Marcellus', serif;
+    text-transform: uppercase;
+    letter-spacing: 0.2em;
+    cursor: pointer;
+    position: relative;
+    transition: all 500ms ease-out;
+}
+
+.btn-primary:hover {
+    background-color: var(--accent);
+    color: var(--bg-base);
+    box-shadow: 0 0 20px rgba(212, 175, 55, 0.4);
+}
+
+:root.light-theme .btn-primary {
+    background-color: var(--fg-primary); /* Rich Charcoal */
+    color: var(--bg-base);
+}
+
+:root.light-theme .btn-primary::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; width: 100%; height: 100%;
+    background-color: var(--accent); /* Metallic Gold */
+    transform: translateX(-100%);
+    transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    z-index: -1;
+}
+
+:root.light-theme .btn-primary:hover::before {
+    transform: translateX(0);
+}

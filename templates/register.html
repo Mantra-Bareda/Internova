@@ -1,0 +1,270 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Internova - Create Account</title>
+    <link href="https://fonts.googleapis.com/css2?family=Marcellus&family=Josefin+Sans:wght@300;400;600&display=swap" rel="stylesheet">
+    <style>
+        body {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            background-color: #0A0A0A;
+            background-image: 
+                linear-gradient(135deg, rgba(26, 11, 46, 0.95) 0%, rgba(0, 0, 0, 1) 100%),
+                linear-gradient(rgba(212, 175, 55, 0.05) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(212, 175, 55, 0.05) 1px, transparent 1px),
+                radial-gradient(circle, rgba(212, 175, 55, 0.15) 1px, transparent 1.5px);
+            background-size: 100% 100%, 40px 40px, 40px 40px, 40px 40px;
+            background-position: 0 0, 0 0, 0 0, -1px -1px;
+            background-attachment: fixed;
+            position: relative;
+            max-width: 100%;
+            overflow-x: clip;
+            padding: 24px;
+            box-sizing: border-box;
+            font-family: 'Josefin Sans', sans-serif;
+        }
+
+        nav {
+            display: none;
+        }
+
+        .register-container {
+            background: #141414;
+            border: 1px solid rgba(212, 175, 55, 0.3);
+            border-radius: 1rem;
+            padding: 2rem 1.5rem;
+            width: 100%;
+            max-width: 420px;
+            box-shadow: 0 0 15px rgba(212, 175, 55, 0.05);
+            position: relative;
+            z-index: 1;
+            margin: auto;
+            transition: all 500ms ease-out;
+        }
+
+        @media (min-width: 768px) {
+            .register-container {
+                padding: 3rem;
+            }
+        }
+
+        .register-container:hover {
+            border-color: rgba(212, 175, 55, 1);
+            box-shadow: 0 0 20px rgba(212, 175, 55, 0.2);
+            transform: translateY(-8px);
+        }
+
+        .register-container::before, .register-container::after {
+            content: '';
+            position: absolute;
+            width: 1.5rem;
+            height: 1.5rem;
+            border: 2px solid #D4AF37;
+            opacity: 0.5;
+            transition: opacity 500ms;
+            pointer-events: none;
+        }
+
+        .register-container::before {
+            top: 0.5rem; left: 0.5rem;
+            border-right: none; border-bottom: none;
+        }
+
+        .register-container::after {
+            bottom: 0.5rem; right: 0.5rem;
+            border-left: none; border-top: none;
+        }
+
+        .register-container:hover::before, .register-container:hover::after {
+            opacity: 1;
+        }
+
+        .register-header {
+            text-align: center;
+            margin-bottom: 32px;
+        }
+
+        .register-header h1 {
+            font-family: 'Marcellus', serif;
+            font-size: 2rem;
+            color: #D4AF37;
+            text-transform: uppercase;
+            letter-spacing: 0.2em;
+            margin: 0 0 8px 0;
+            text-shadow: 0 0 10px rgba(212, 175, 55, 0.3);
+        }
+
+        .register-header p {
+            color: #888888;
+            margin: 0;
+            font-size: 0.95rem;
+        }
+
+        .register-form {
+            display: flex;
+            flex-direction: column;
+            gap: 24px;
+        }
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .form-group label {
+            font-size: 0.875rem;
+            color: #D4AF37;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+        }
+
+        .form-group input {
+            height: 48px;
+            padding: 8px 12px;
+            font-family: 'Josefin Sans', sans-serif;
+            font-size: 1rem;
+            background-color: transparent;
+            color: #F2F0E4;
+            border: none;
+            border-bottom: 2px solid #D4AF37;
+            border-radius: 0;
+            transition: all 300ms ease-out;
+        }
+
+        .form-group input::placeholder {
+            color: #888888;
+        }
+
+        .form-group input:focus {
+            outline: none;
+            border-bottom-color: #F2E8C4;
+            box-shadow: 0 4px 10px rgba(212, 175, 55, 0.2);
+        }
+
+        .register-button {
+            height: 48px;
+            background-color: transparent;
+            color: #D4AF37;
+            border: 2px solid #D4AF37;
+            border-radius: 0;
+            font-size: 1rem;
+            font-family: 'Marcellus', serif;
+            text-transform: uppercase;
+            letter-spacing: 0.2em;
+            cursor: pointer;
+            transition: all 500ms ease-out;
+            margin-top: 8px;
+        }
+
+        .register-button:hover {
+            background-color: #D4AF37;
+            color: #0A0A0A;
+            box-shadow: 0 0 20px rgba(212, 175, 55, 0.4);
+        }
+
+        .register-button:active {
+            transform: scale(0.95);
+        }
+
+        .register-footer {
+            text-align: center;
+            margin-top: 24px;
+            padding-top: 24px;
+            border-top: 1px solid rgba(212, 175, 55, 0.2);
+        }
+
+        .register-footer p {
+            color: #888888;
+            font-size: 0.95rem;
+            margin: 0 0 12px 0;
+        }
+
+        .login-link {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 10px 16px;
+            background-color: transparent;
+            color: #D4AF37;
+            border: 1px solid #D4AF37;
+            border-radius: 0;
+            text-decoration: none;
+            font-size: 0.875rem;
+            font-family: 'Marcellus', serif;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            transition: all 300ms ease-out;
+        }
+
+        .login-link:hover {
+            background-color: #1E3D59;
+            border-color: #1E3D59;
+            color: #F2F0E4;
+        }
+
+        .info-box {
+            background: rgba(212, 175, 55, 0.05);
+            border-left: 2px solid #D4AF37;
+            border-radius: 0;
+            padding: 12px;
+            font-size: 0.875rem;
+            color: #888888;
+            margin-top: 12px;
+        }
+    </style>
+</head>
+<body>
+    <div class="register-container">
+        <div class="register-header">
+            <h1>🎓 Welcome!</h1>
+            <p>Create your Internova account</p>
+        </div>
+
+        <div class="register-form">
+            <button id="google-signin-btn" class="register-button" style="margin-top: 20px;">Sign up with Google</button>
+        </div>
+
+        <div class="register-footer">
+            <p>Already have an account?</p>
+            <a href="{{ url_for('login') }}" class="login-link">Sign In →</a>
+        </div>
+    </div>
+
+    <script type="module">
+      import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+      import { getAuth, signInWithPopup, GoogleAuthProvider } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+      
+    const firebaseConfig = {
+    apiKey: "AIzaSyDRQS0h57pp2GYySQtrhBnZzbYGNmlPz0U",
+    authDomain: "internova-42b43.firebaseapp.com",
+    projectId: "internova-42b43",
+    storageBucket: "internova-42b43.firebasestorage.app",
+    messagingSenderId: "1048210898596",
+    appId: "1:1048210898596:web:d97ad4b5bbd0dfa01f3031",
+    measurementId: "G-230FS7J4K2"
+  };
+      
+      const app = initializeApp(firebaseConfig);
+      const auth = getAuth(app);
+      const provider = new GoogleAuthProvider();
+
+      document.getElementById('google-signin-btn').addEventListener('click', () => {
+        signInWithPopup(auth, provider)
+          .then((result) => result.user.getIdToken())
+          .then((idToken) => fetch('{{ url_for("google_auth") }}', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({ id_token: idToken })
+          }))
+          .then(response => response.json())
+          .then(data => data.success ? window.location.href = data.redirect : alert('Login failed: ' + data.error))
+          .catch((error) => console.error("Error during Google Sign-in:", error));
+      });
+    </script>
+</body>
+</html>
